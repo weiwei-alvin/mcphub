@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "everything-stdio": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["D:/AI-Lab/MCP-HUB-acceptance/node_modules/@modelcontextprotocol/server-everything/dist/index.js", "stdio"],
+      "disabled": false
+    },
+    "everything-http": {
+      "type": "streamableHttp",
+      "url": "http://127.0.0.1:3051/mcp",
+      "disabled": false
+    }
+  }
+}

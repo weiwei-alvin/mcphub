@@ -1,0 +1,6 @@
+node_modules/
+__pycache__/
+.serena/
+.claude/
+.harness.bak-*/
+.harness/writer.lock

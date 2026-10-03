@@ -1,0 +1,17 @@
+{
+  "name": "mcp-hub-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MCP Hub local admin app",
+  "type": "commonjs",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test test/"
+  },
+  "dependencies": {
+    "@1mcp/agent": "0.38.2",
+    "@fastify/static": "10.1.5",
+    "fastify": "5.12.5"
+  }
+}

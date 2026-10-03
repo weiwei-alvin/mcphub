@@ -1,0 +1,17 @@
+{
+  "ticket_id": "T-001",
+  "review_round": 1,
+  "source_hash": "81d77fe1c0177fdf4c21a19acf73192888ce0050d86e108af2e40d2bb8199dd5",
+  "verification_id": "01205bd735d1457198a95688a3cc7735",
+  "all_passed": true,
+  "results": [
+    {
+      "step_id": "AT-001",
+      "status": "PASSED",
+      "stdout": "AUTOMATED_CHECK_PASS T-001\nMANUAL_CRITERIA_STILL_REQUIRED: this is not an iPhone or whole-ticket verdict\n",
+      "stderr": "",
+      "returncode": 0,
+      "error": null
+    }
+  ]
+}

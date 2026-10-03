@@ -1,0 +1,19 @@
+{
+  "recorded_at": "2026-10-02T23:30:05",
+  "host_os": "Windows 11 Home 10.0.26200",
+  "node": "v24.19.0",
+  "gateway": "@1mcp/agent 0.38.2 (npm, local prefix D:\\AI-Lab\\MCP-HUB-acceptance)",
+  "gateway_flags": "serve --transport http --host 127.0.0.1 --port 3050 --external-url https://alvin.tail63d20f.ts.net --enable-config-reload false",
+  "test_mcp": "@modelcontextprotocol/server-everything 2026.8.31 (serverInfo mcp-servers/everything 2.0.0); stdio + streamableHttp on 127.0.0.1:3051 via http-loopback.mjs",
+  "mcp_protocol_versions_negotiated": [
+    "2025-11-25",
+    "2025-06-18"
+  ],
+  "tailscale_windows": "1.102.2",
+  "tailscale_serve": "https://alvin.tail63d20f.ts.net/mcp -> http://127.0.0.1:3050/mcp (tailnet only, path /mcp only)",
+  "tailscale_acl": "tcp:443 on mcp-host 100.119.224.46 granted only to iphone 100.88.86.52; all other access unchanged",
+  "iphone": "iPhone 15 Plus, iOS 18.7 (Safari UA in gateway log), tailnet IP 100.88.86.52",
+  "open_minis": "1.15 (build 7) - USER-REPORTED, version screenshot not yet attached [UNVERIFIED]",
+  "minis_client_note": "Calls issued by Open Minis via minis-mcp-cli in its on-device Linux env (python-httpx/0.27.2), not native in-app tool call",
+  "minis_dns_workaround": "/etc/hosts in Minis env: 100.119.224.46 alvin.tail63d20f.ts.net (carrier DNS cannot resolve tailnet name); remove: sed -i /alvin.tail63d20f.ts.net/d /etc/hosts"
+}

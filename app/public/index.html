@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <title>MCP Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; max-width: 46rem; }
+    button { font-size: 1rem; padding: 0.5rem 1rem; margin-right: 0.5rem; }
+    section { margin-bottom: 2rem; }
+    table { border-collapse: collapse; width: 100%; margin-top: 0.75rem; }
+    th, td { border-bottom: 1px solid #ddd; padding: 0.4rem 0.5rem; text-align: left; font-size: 0.95rem; }
+    fieldset { border: 1px solid #ccc; margin: 0.75rem 0; padding: 0.75rem; }
+    label { display: block; margin: 0.4rem 0; }
+    input, select { font-size: 0.95rem; padding: 0.25rem; min-width: 18rem; }
+    #gateway-status { margin-top: 1rem; font-weight: 600; }
+    #gateway-status[data-state="running"] { color: #0a7d2e; }
+    #gateway-status[data-state="stopped"] { color: #555; }
+    #gateway-status[data-state="error"], #gateway-status[data-state="unknown"] { color: #b00020; }
+    #apply-status { margin-top: 0.5rem; font-weight: 600; }
+    #apply-status[data-state="applied"] { color: #0a7d2e; }
+    #apply-status[data-state="error"] { color: #b00020; }
+    .field-error { color: #b00020; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <h1>MCP Hub</h1>
+
+  <section aria-label="Gateway 控制">
+    <button type="button" id="gateway-start">啟動 Gateway</button>
+    <button type="button" id="gateway-stop">停止 Gateway</button>
+    <button type="button" id="gateway-restart">重啟 Gateway</button>
+    <p role="status" id="gateway-status" aria-live="polite"></p>
+  </section>
+
+  <section aria-label="MCP 設定">
+    <h2>MCP 設定</h2>
+
+    <form id="service-form">
+      <fieldset>
+        <legend>新增 MCP Server</legend>
+
+        <label for="field-name">服務名稱</label>
+        <input id="field-name" name="name" autocomplete="off" />
+        <p class="field-error" id="error-name" role="alert" hidden></p>
+
+        <label for="field-transport">傳輸類型</label>
+        <select id="field-transport" name="transport">
+          <option value="stdio">stdio</option>
+          <option value="http">Streamable HTTP</option>
+        </select>
+        <p class="field-error" id="error-transport" role="alert" hidden></p>
+
+        <div id="stdio-fields">
+          <label for="field-command">啟動命令</label>
+          <input id="field-command" name="command" autocomplete="off" />
+          <p class="field-error" id="error-command" role="alert" hidden></p>
+
+          <label for="field-args">命令參數</label>
+          <input id="field-args" name="args" autocomplete="off" placeholder='["stdio"]' />
+          <p class="field-error" id="error-args" role="alert" hidden></p>
+        </div>
+
+        <div id="http-fields" hidden>
+          <label for="field-url">服務 URL</label>
+          <input id="field-url" name="url" autocomplete="off" />
+          <p class="field-error" id="error-url" role="alert" hidden></p>
+        </div>
+
+        <button type="submit">新增 MCP Server</button>
+      </fieldset>
+    </form>
+
+    <table>
+      <caption>已設定的 MCP Server</caption>
+      <thead>
+        <tr><th scope="col">名稱</th><th scope="col">傳輸</th></tr>
+      </thead>
+      <tbody id="service-rows"></tbody>
+    </table>
+
+    <p id="draft-status" hidden></p>
+    <button type="button" id="apply-config">儲存並套用</button>
+    <p role="status" id="apply-status" aria-live="polite"></p>
+    <p id="apply-detail"></p>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>

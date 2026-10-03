@@ -1,0 +1,14 @@
+{
+  "role": "tester",
+  "model": "openrouter/qwen/qwen3.8-27b:free",
+  "started": "2026-10-02T12:26:46.452049+00:00",
+  "exit_code": 124,
+  "event_errors": 0,
+  "tool_calls": [
+    "read",
+    "read",
+    "read"
+  ],
+  "has_text": false,
+  "status": "FAILED"
+}

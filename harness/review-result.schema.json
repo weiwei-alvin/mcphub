@@ -1,0 +1,198 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "review-result.schema.json",
+  "title": "Review Verdict Payload",
+  "description": "Structured payload submitted by REVIEW for the active Ticket. Findings use finding.schema.json. The Runner validates this, checks it against the Ticket Transitions table, applies the Review Attempt Rule (review_attempts += 1 on FIX_REQUIRED), and only then updates state.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ticket_id",
+    "verdict",
+    "criteria",
+    "findings"
+  ],
+  "properties": {
+    "ticket_id": {
+      "type": "string",
+      "pattern": "^T-[0-9]{3,}$"
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "FIX_REQUIRED",
+        "USER_DECISION_REQUIRED"
+      ]
+    },
+    "criteria": {
+      "type": "array",
+      "minItems": 1,
+      "description": "One entry per Ticket Acceptance Criterion. For the final Ticket in V1, also include an entry with id 'FINAL_INTEGRATION' covering Final Integrated Verification (Harness main document, section 15).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "status",
+          "critical"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PASS",
+              "FAIL",
+              "UNVERIFIED"
+            ]
+          },
+          "evidence": {
+            "type": "string"
+          },
+          "critical": {
+            "type": "boolean",
+            "description": "Whether this criterion must be PASS for the overall verdict to be PASS. A non-critical criterion (e.g. a minor style note) may be FAIL or UNVERIFIED without blocking PASS, but must still be recorded."
+          },
+          "source": {
+            "type": "string"
+          },
+          "limitations": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "description": "Blocking or non-blocking findings raised this attempt. When verdict = PASS, must not contain any finding with blocking = true (non-blocking findings may remain). Must contain at least one blocking finding when verdict = FIX_REQUIRED.",
+      "items": {
+        "$ref": "finding.schema.json"
+      }
+    },
+    "decision_context": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "gate-result.schema.json#/$defs/decisionContext"
+        }
+      ],
+      "description": "Required when verdict = USER_DECISION_REQUIRED."
+    },
+    "review_round": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "source_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "verification_id": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "verdict": {
+            "const": "PASS"
+          }
+        },
+        "required": [
+          "verdict"
+        ]
+      },
+      "then": {
+        "properties": {
+          "findings": {
+            "not": {
+              "contains": {
+                "properties": {
+                  "blocking": {
+                    "const": true
+                  }
+                },
+                "required": [
+                  "blocking"
+                ]
+              }
+            }
+          },
+          "criteria": {
+            "items": {
+              "if": {
+                "properties": {
+                  "critical": {
+                    "const": true
+                  }
+                },
+                "required": [
+                  "critical"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "status": {
+                    "const": "PASS"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "verdict": {
+            "const": "FIX_REQUIRED"
+          }
+        },
+        "required": [
+          "verdict"
+        ]
+      },
+      "then": {
+        "properties": {
+          "findings": {
+            "contains": {
+              "properties": {
+                "blocking": {
+                  "const": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "verdict": {
+            "const": "USER_DECISION_REQUIRED"
+          }
+        },
+        "required": [
+          "verdict"
+        ]
+      },
+      "then": {
+        "required": [
+          "decision_context"
+        ],
+        "properties": {
+          "decision_context": {
+            "$ref": "gate-result.schema.json#/$defs/decisionContext"
+          }
+        }
+      }
+    }
+  ]
+}

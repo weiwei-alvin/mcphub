@@ -1,0 +1,23 @@
+{
+  "isolated": true,
+  "sandbox_root": "D:/AI-Lab/MCP-HUB-acceptance",
+  "gateway_url": "https://alvin.tail63d20f.ts.net/mcp",
+  "protocol_versions": ["2025-11-25", "2025-06-18"],
+  "services": [
+    {
+      "name": "everything-stdio",
+      "transport": "stdio",
+      "command": "node",
+      "arguments": ["D:/AI-Lab/MCP-HUB-acceptance/node_modules/@modelcontextprotocol/server-everything/dist/index.js", "stdio"],
+      "call": {"name": "$SERVICE_1mcp_get-sum", "arguments": {"a": 2, "b": 3}},
+      "expected": [{"path": ["content", 0, "text"], "equals": "The sum of 2 and 3 is 5."}]
+    },
+    {
+      "name": "everything-http",
+      "transport": "http",
+      "url": "http://127.0.0.1:3051/mcp",
+      "call": {"name": "$SERVICE_1mcp_get-sum", "arguments": {"a": 40, "b": 2}},
+      "expected": [{"path": ["content", 0, "text"], "equals": "The sum of 40 and 2 is 42."}]
+    }
+  ]
+}

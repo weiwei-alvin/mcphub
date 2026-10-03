@@ -1,0 +1,529 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "state.schema.json",
+  "title": "Coding Harness Runtime State",
+  "description": "Machine-readable runtime state for the Coding Harness. v1.1 adds the 'pause' field so a restarted Runner can resume deterministically without re-inferring why the project stopped (Harness main document, sections 9 and 21).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "project_status",
+    "pipeline_stage",
+    "stage_status",
+    "active_ticket_id",
+    "pause",
+    "tickets",
+    "findings"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.1",
+      "description": "Runtime state schema version."
+    },
+    "project_status": {
+      "type": "string",
+      "enum": [
+        "IN_PROGRESS",
+        "PAUSED",
+        "COMPLETE"
+      ],
+      "description": "Overall project execution status."
+    },
+    "pipeline_stage": {
+      "type": "string",
+      "enum": [
+        "DISCOVERY",
+        "SPEC",
+        "TICKETS",
+        "IMPLEMENTATION",
+        "REVIEW"
+      ],
+      "description": "Current Harness pipeline stage."
+    },
+    "stage_status": {
+      "type": "string",
+      "enum": [
+        "IN_PROGRESS",
+        "READY_FOR_GATE"
+      ],
+      "description": "Execution status within the current planning stage. IMPLEMENTATION and REVIEW use ticket status for detailed state."
+    },
+    "active_ticket_id": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^T-[0-9]{3,}$"
+        }
+      ],
+      "description": "Currently active Ticket. Must be null outside IMPLEMENTATION and REVIEW."
+    },
+    "pause": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/pause"
+        }
+      ],
+      "description": "Non-null only when project_status = PAUSED. Points to the decision artifact under .harness/decisions/ (see Harness main document, section 9)."
+    },
+    "tickets": {
+      "type": "object",
+      "description": "Runtime state for all V1 Tickets.",
+      "patternProperties": {
+        "^T-[0-9]{3,}$": {
+          "$ref": "#/$defs/ticket"
+        }
+      },
+      "additionalProperties": false
+    },
+    "findings": {
+      "type": "object",
+      "description": "Blocking findings created during Review.",
+      "patternProperties": {
+        "^F-[0-9]{3,}$": {
+          "$ref": "#/$defs/finding"
+        }
+      },
+      "additionalProperties": false
+    },
+    "final_verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "approved_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sha256"
+      ],
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "description": "Digest of tickets, golden_path.json and SPEC.md recorded at TICKETS gate PASS; later changes pause the project until a decision accepts them."
+    }
+  },
+  "$defs": {
+    "pause": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reason",
+        "decision_ref"
+      ],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "enum": [
+            "GATE_USER_DECISION_REQUIRED",
+            "REVIEW_USER_DECISION_REQUIRED",
+            "RETRY_LIMIT_REACHED",
+            "PLAN_CHANGE_REQUIRES_DECISION"
+          ],
+          "description": "Event that caused project_status to become PAUSED."
+        },
+        "decision_ref": {
+          "type": "string",
+          "pattern": "^DEC-[0-9]{3,}$",
+          "description": "New workflows use .harness/decisions/DEC-NNN.json; legacy .md decisions are not auto-resumed."
+        },
+        "pause_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "ticket": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "review_attempts",
+        "active_findings"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "TODO",
+            "IN_PROGRESS",
+            "READY_FOR_REVIEW",
+            "COMPLETE",
+            "INVALIDATED",
+            "PAUSED"
+          ],
+          "description": "Current lifecycle status of the Ticket."
+        },
+        "review_attempts": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Cumulative FIX_REQUIRED count; never reset on resume."
+        },
+        "active_findings": {
+          "type": "array",
+          "description": "Finding IDs currently associated with unresolved blocking Review findings.",
+          "items": {
+            "type": "string",
+            "pattern": "^F-[0-9]{3,}$"
+          },
+          "uniqueItems": true,
+          "default": []
+        },
+        "fix_loop_memory": {
+          "type": "object",
+          "description": "Fix loop memory for retry context (active findings, failure reasons, previous fix summary). Populated by Runner on FIX_REQUIRED.",
+          "properties": {
+            "attempt_number": {
+              "type": "integer"
+            },
+            "active_findings": {
+              "type": "array"
+            },
+            "active_finding_keys": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "failure_reasons": {
+              "type": "array"
+            },
+            "previous_fix_summary": {
+              "type": "string"
+            },
+            "previous_failure_reasons": {
+              "type": "array"
+            },
+            "total_findings_count": {
+              "type": "integer"
+            },
+            "blocking_findings_count": {
+              "type": "integer"
+            },
+            "fix_summary": {
+              "type": "string"
+            }
+          }
+        },
+        "review_total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "retry_limit": {
+          "type": "integer",
+          "minimum": 3
+        },
+        "verification": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "review_history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            }
+          }
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ticket_id",
+        "finding_key",
+        "status",
+        "first_detected_attempt",
+        "last_seen_attempt",
+        "reopen_count"
+      ],
+      "properties": {
+        "ticket_id": {
+          "type": "string",
+          "pattern": "^T-[0-9]{3,}$",
+          "description": "Ticket associated with this finding."
+        },
+        "finding_key": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "description": "Stable slug from the Reviewer's finding payload (finding.schema.json). The Runner matches (ticket_id, finding_key) against existing findings to decide OPEN / RESOLVED / REOPENED and to assign or reuse the Finding ID (Harness main document, section 8)."
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "OPEN",
+            "RESOLVED",
+            "REOPENED"
+          ],
+          "description": "Current lifecycle status of the finding."
+        },
+        "first_detected_attempt": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Review round in which the finding was first detected."
+        },
+        "last_seen_attempt": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Most recent Review round in which the finding was observed."
+        },
+        "reopen_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of times a previously resolved finding reappeared."
+        },
+        "criterion_ref": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "blocking": {
+          "type": "boolean"
+        },
+        "evidence": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "pipeline_stage": {
+            "enum": [
+              "DISCOVERY",
+              "SPEC",
+              "TICKETS"
+            ]
+          }
+        },
+        "required": [
+          "pipeline_stage"
+        ]
+      },
+      "then": {
+        "properties": {
+          "active_ticket_id": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "pipeline_stage": {
+            "enum": [
+              "IMPLEMENTATION",
+              "REVIEW"
+            ]
+          },
+          "project_status": {
+            "enum": [
+              "IN_PROGRESS",
+              "PAUSED"
+            ]
+          }
+        },
+        "required": [
+          "pipeline_stage",
+          "project_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "active_ticket_id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "pattern": "^T-[0-9]{3,}$"
+          },
+          "stage_status": {
+            "const": "IN_PROGRESS"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "stage_status": {
+            "const": "READY_FOR_GATE"
+          }
+        },
+        "required": [
+          "stage_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "pipeline_stage": {
+            "enum": [
+              "DISCOVERY",
+              "SPEC",
+              "TICKETS"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "project_status": {
+            "const": "PAUSED"
+          }
+        },
+        "required": [
+          "project_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "pause": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "pause"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "project_status": {
+            "enum": [
+              "IN_PROGRESS",
+              "COMPLETE"
+            ]
+          }
+        },
+        "required": [
+          "project_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "pause": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "project_status": {
+            "const": "COMPLETE"
+          }
+        },
+        "required": [
+          "project_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "active_ticket_id": {
+            "type": "null"
+          },
+          "tickets": {
+            "type": "object",
+            "minProperties": 1,
+            "patternProperties": {
+              "^T-[0-9]{3,}$": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "const": "COMPLETE"
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "findings": {
+            "type": "object",
+            "patternProperties": {
+              "^F-[0-9]{3,}$": {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "status": {
+                        "const": "RESOLVED"
+                      }
+                    }
+                  },
+                  {
+                    "required": [
+                      "blocking"
+                    ],
+                    "properties": {
+                      "blocking": {
+                        "const": false
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  ]
+}

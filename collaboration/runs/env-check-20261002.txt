@@ -1,0 +1,40 @@
+== python
+Python 3.14.5
+ -V:3.14 *        C:\Python314\python.exe
+ -V:3.13          C:\Users\m8508\AppData\Local\Programs\Python\Python313\python.exe
+ -V:3.12          C:\Users\m8508\AppData\Local\Programs\Python\Python312\python.exe
+ -V:Astral/CPython3.12.13 C:\Users\m8508\AppData\Roaming\uv\python\cpython-3.12.13-windows-x86_64-none\python.exe
+ -V:Astral/CPython3.11.15 C:\Users\m8508\AppData\Roaming\uv\python\cpython-3.11.15-windows-x86_64-none\python.exe
+== jsonschema
+4.26.0 C:\Python314\python.exe
+== opencode
+C:\Users\m8508\.bun\bin\opencode.exe
+1.18.33
+== node
+v24.19.0
+12.0.2
+== wsl
+?身??蝢斤?: Ubuntu
+?身?: 2
+  NAME               STATE           VERSION
+* Ubuntu             Running         2
+  OpenClawGateway    Stopped         2
+  docker-desktop     Stopped         2
+== tailscale
+C:\Program Files\Tailscale\tailscale.exe
+== harness
+D:\AI-Lab\Coding-Audit-Harness
+D:\AI-Lab\Coding-Audit-Harness\.harness
+D:\AI-Lab\Coding-Audit-Harness\harness
+D:\AI-Lab\Coding-Audit-Harness\03_Codex-Experiments\harness-review-fixes-2026-09-29
+D:\AI-Lab\MCP HUB\.harness
+D:\AI-Lab\Multi_Agents-Orchestra\harness
+C:\Users\m8508\.ao\data\prompts\human-guided-file-classification-harness-1
+C:\Users\m8508\.ao\data\worktrees\human-guided-file-classification-harness
+C:\Users\m8508\.claude\projects\D--04-AI-Lab-01-Active-Projects-Human-Guided-File-Classification-Harness
+C:\Users\m8508\.skills-manager\skills\evaluating-llms-harness
+C:\Users\m8508\.skills-manager\skills\evaluating-llms-harness-2
+C:\Users\m8508\.skills-manager\skills\evaluating-llms-harness-3
+C:\Users\m8508\.skills-manager\skills\evaluating-llms-harness-4
+C:\Users\m8508\.skills-manager\skills\harness-teaching-material-production
+C:\Users\m8508\.skills-manager\skills\harness-translation-preflight

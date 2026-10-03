@@ -1,0 +1,10 @@
+{
+  "role": "reviewer",
+  "model": "opencode/nemotron-3-ultra-free",
+  "started": "2026-10-02T12:24:27.702370+00:00",
+  "exit_code": 1,
+  "event_errors": 1,
+  "tool_calls": [],
+  "has_text": false,
+  "status": "FAILED"
+}

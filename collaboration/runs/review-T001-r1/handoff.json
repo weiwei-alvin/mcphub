@@ -1,0 +1,33 @@
+{
+  "ticket_id": "T-001",
+  "review_round": 1,
+  "source_hash": "7f4e5fd6da93706ea897ae4b98fb7ab159e68e8f60feedbfb0770fed4c5ac0fd",
+  "verification_id": "e4615cdacb594dd09c88b7816b1c5249",
+  "changes": [
+    {"file": "D:/AI-Lab/MCP-HUB-acceptance/package.json (outside project)", "summary": "Isolated test env: @1mcp/agent 0.38.2 and @modelcontextprotocol/server-everything 2026.8.31 installed with npm --save-exact into a local prefix; no global install, no project source change."},
+    {"file": "D:/AI-Lab/MCP-HUB-acceptance/gateway-config/mcp.json (outside project)", "summary": "Gateway downstream inventory: everything-stdio (stdio) and everything-http (streamableHttp at 127.0.0.1:3051). Gateway runs serve --host 127.0.0.1 --port 3050 --external-url https://alvin.tail63d20f.ts.net --enable-config-reload false."},
+    {"file": "D:/AI-Lab/MCP-HUB-acceptance/http-loopback.mjs (outside project)", "summary": "Test-env shim forcing server-everything's streamableHttp listener onto 127.0.0.1 (package binds all interfaces by default); package itself unmodified."},
+    {"file": "D:/AI-Lab/MCP-HUB-acceptance/fixture.json (outside project)", "summary": "Secret-free AT-001 fixture: gateway_url https://alvin.tail63d20f.ts.net/mcp, protocol versions 2025-11-25/2025-06-18, stdio get-sum(2,3)=5 and http get-sum(40,2)=42."},
+    {"file": "tailscale serve (Windows node alvin)", "summary": "https://alvin.tail63d20f.ts.net/mcp -> http://127.0.0.1:3050/mcp, tailnet only, only path /mcp proxied. Rollback: tailscale serve reset."},
+    {"file": "Tailscale ACL (admin console, applied by operator)", "summary": "Default allow-all split so behaviour is unchanged except tcp:443 on 100.119.224.46 is granted only to iphone 100.88.86.52. Rollback: restore previous default policy."},
+    {"file": "Open Minis env /etc/hosts (iPhone, applied by operator)", "summary": "100.119.224.46 alvin.tail63d20f.ts.net, because the Minis env uses carrier DNS that cannot resolve tailnet names. Rollback: sed -i '/alvin.tail63d20f.ts.net/d' /etc/hosts."}
+  ],
+  "verification": [
+    {"step": "python harness/runner/runner.py verify-ticket --ticket T-001 --trust-commands (AT-001)", "expected": "AT-001 PASSED, AUTOMATED_CHECK_PASS T-001", "actual": "AT-001 PASSED rc=0, verification_id e4615cdacb594dd09c88b7816b1c5249", "status": "PASS"},
+    {"step": "Breakage 1: check.py --ticket T-001 with a fixture copy expecting 'The sum of 40 and 2 is 43.'", "expected": "exit 1", "actual": "CHECK_FAILED T-001: AssertionError, exit 1", "status": "PASS"},
+    {"step": "Breakage 2: stop HTTP downstream, run check.py --ticket T-001", "expected": "exit 1", "actual": "CHECK_FAILED T-001: AssertionError, exit 1", "status": "PASS"},
+    {"step": "iPhone 15 Plus, Wi-Fi off (4G), Tailscale on, Open Minis server mcp-hub (HTTP, https://alvin.tail63d20f.ts.net/mcp): call everything-stdio_1mcp_get-sum(2,3) and everything-http_1mcp_get-sum(40,2)", "expected": "'The sum of 2 and 3 is 5.' and 'The sum of 40 and 2 is 42.' with requests logged from 100.88.86.52", "actual": "Both texts returned (evidence 04 at 23:16, 05 at 23:29 after ACL); gateway log shows x-forwarded-for 100.88.86.52 with matching tools/call params at 15:16:13-14Z and 15:29:04-05Z", "status": "PASS"},
+    {"step": "Unauthorized tailnet source: from WSL node alvin-1 (100.79.209.7) POST initialize to https://alvin.tail63d20f.ts.net/mcp after ACL", "expected": "Connection refused/timeout, no gateway log entry", "actual": "curl exit 28 (timeout), 0 gateway log entries from 100.79.209.7 after ACL; before ACL the same source reached the gateway (1 entry)", "status": "PASS"},
+    {"step": "Remote entry exposes only /mcp: GET /oauth, /, /health, /sse via https://alvin.tail63d20f.ts.net from the host", "expected": "404 for all non-/mcp paths", "actual": "404, 404, 404, 404; tailscale serve status shows only /mcp proxied, tailnet only", "status": "PASS"},
+    {"step": "No public entry: tailscale serve status on node alvin", "expected": "tailnet only, no Funnel", "actual": "'https://alvin.tail63d20f.ts.net (tailnet only)'; probe from an off-tailnet internet host was not executed", "status": "PASS"},
+    {"step": "Open Minis version record", "expected": "Version screenshot attached", "actual": "Operator reported 1.15 (build 7); version screenshot not attached to evidence", "status": "UNVERIFIED"},
+    {"step": "Off-tailnet (public internet) source cannot reach the gateway, tested from an actual non-tailnet client", "expected": "Unreachable", "actual": "Not executed; only configuration evidence (tailnet-only serve, CGNAT 100.x address) available", "status": "UNVERIFIED"}
+  ],
+  "dependencies": [
+    "@1mcp/agent 0.38.2 (Gateway, Node 24.19.0 on Windows)",
+    "@modelcontextprotocol/server-everything 2026.8.31 (two credential-free test MCPs)",
+    "Tailscale 1.102.2 (Windows) with Serve and ACL",
+    "Open Minis 1.15 build 7 on iPhone (operator-reported)",
+    "tests/acceptance/check.py (unchanged)"
+  ]
+}

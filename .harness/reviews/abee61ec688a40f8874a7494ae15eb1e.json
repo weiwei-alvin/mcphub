@@ -1,0 +1,198 @@
+{
+  "review": {
+    "ticket_id": "T-002",
+    "review_round": 1,
+    "source_hash": "aede1d50ae57df18de5cc942e7c43f7550fa2262bd1ab67c8cb9a45e7116e763",
+    "verification_id": "4bccd3966ec74313a0a0a0cfdc6cd9b9",
+    "verdict": "PASS",
+    "criteria": [
+      {
+        "id": "AT-001",
+        "status": "PASS",
+        "critical": true
+      },
+      {
+        "id": "AT-002",
+        "status": "PASS",
+        "critical": true
+      },
+      {
+        "id": "AC-1-SINGLE-ENTRY",
+        "status": "PASS",
+        "critical": true,
+        "source": "Killed the Hub (PID 43336), confirmed 3100 released, then ran `cmd /c start-hub.cmd` with no other terminal input: 3100 listening within 8s under PID 30932; GET / returned HTTP 200 with <title>MCP Hub</title>; GET /api/gateway/status returned state=running pid=45720 matching the CLI Runtime PID. Full transcript in .harness/review-notes/T-002.md",
+        "limitations": "Browser launch confirmed only as process presence (chrome 18 / msedge 5 already running), not attributed to a specific new tab; the UI-button path was exercised through the automated check rather than a fresh click-through of the .cmd flow"
+      },
+      {
+        "id": "AC-2-REAL-AVAILABILITY",
+        "status": "PASS",
+        "critical": true,
+        "source": "Automated `check.py lifecycle` on the real Gateway: pair_calls both tools callable, stop button -> UI 'Gateway 已停止' + unavailable() confirms initialize refused, start button -> 'Gateway 運作中' + both tools callable again, restart button -> same. Manual: cold POST /api/gateway/start 13.7s -> state=running pid=24108 with 'Readiness (/health/ready): ready'; POST /api/gateway/stop -> state=stopped with 3050 released and all 1mcp processes gone. Port-occupied start returns state=error, never Running (see AC-4).",
+        "limitations": "Tool calls are proven to traverse the Gateway (fixture gateway_url is http://127.0.0.1:3050/mcp; gateway log grew 8958 bytes during a check.py run; manual tools/call against 127.0.0.1:3050/mcp returned 'The sum of 2 and 3 is 5.' and 'The sum of 40 and 2 is 42.'). Downstream-layer health is not part of this criterion: with the http downstream killed, the Gateway still reports running and /health/ready still 200 while the http tool returns -32603. That is T-007 scope, recorded as a known limitation."
+      },
+      {
+        "id": "AC-3-TAB-CLOSE",
+        "status": "PASS",
+        "critical": true,
+        "source": "check_002 calls page.close() before the final pair_calls(); both services returned their expected results. Independently: killing the whole Hub process (PID 32148) left the Gateway supervisor and runtime alive with 3050 still listening, so the admin UI has no ownership of the Gateway process.",
+        "limitations": "None material. launch.js uses detached + unref, so the server is independent of the launcher."
+      },
+      {
+        "id": "AC-4-NO-FOREIGN-KILL",
+        "status": "PASS",
+        "critical": true,
+        "source": "Scenario 1, port squatter: an unrelated node process (PID 42288) held 127.0.0.1:3050; POST /api/gateway/start returned HTTP 200 in 36.5s with state=error and message 'startup timed out after 30 seconds: port 3050 may be occupied by another process, or the Gateway is unresponsive'; PID 42288 still alive and still OwningProcess of 3050. Scenario 2, unconfirmable identity: server.pid overwritten with '99999'; GET status returned state=unknown with CLI error 'Runtime PID metadata is malformed; retained for manual recovery'; POST stop returned state=error 'stop command sent, but a running process was detected'; real runtime 44020 stayed alive and 3050 stayed listening. Recovery: after clearing processes and server.pid, start returned state=running in 18.8s and server.pid was regenerated.",
+        "limitations": "Cleanup safety verified directly: with server.pid deleted and a squatter (PID 20996) owning 3050, `1mcp --config-dir ... --stop` returned in 1.0s with 'No runtime is running in this Runtime Scope', exit 0, leaving the squatter alive and still owning the port. PID-file corruption was tested by rewriting the file, not by killing the process and letting it go stale; no case where a valid PID file pointed at an unrelated live process was exercised."
+      },
+      {
+        "id": "AC-5-LOCAL-ONLY",
+        "status": "UNVERIFIED",
+        "critical": false,
+        "source": "Get-NetTCPConnection -LocalPort 3100 -State Listen shows LocalAddress 127.0.0.1 only; config.js hardcodes hub.host = '127.0.0.1' with a comment stating the admin page is local-only by design and never configurable to 0.0.0.0. From the host: http://100.119.224.46:3100/ and https://alvin.tail63d20f.ts.net:3100/ both refused. From WSL tailnet node alvin-1 (100.79.209.7): http://100.119.224.46:3100/ returned curl 000. `tailscale serve status` and `tailscale funnel status` both list exactly one rule, 'https://alvin.tail63d20f.ts.net (tailnet only) |-- /mcp proxy http://127.0.0.1:3050/mcp'; port 3100 never appears in the proxy configuration.",
+        "limitations": "The criterion names the iPhone's private remote path and that device was NOT tested; this entry is deliberately left UNVERIFIED and non-critical rather than promoted to PASS on inference. Two independent mechanisms are verified and neither admits a tailnet route to 3100: the listener binds 127.0.0.1 only, and neither `tailscale serve status` nor `tailscale funnel status` contains any rule for 3100 (the sole rule is 'https://alvin.tail63d20f.ts.net (tailnet only) |-- /mcp proxy http://127.0.0.1:3050/mcp', tailnet only, no Funnel). A probe from WSL tailnet node alvin-1 (100.79.209.7) to http://100.119.224.46:3100/ returned curl 000. What remains unobserved is the device-side click itself. A delegated reviewer independently flagged the gap; the coordinator agrees and is recording it rather than closing it. OBLIGATION: close this before T-010 by having the operator open the admin URL from the iPhone over Tailscale and record connection-refused, then promote this criterion to PASS with that evidence. Also untested: whether another local user account can reach 127.0.0.1:3100 (recorded as F-04)."
+      },
+      {
+        "id": "REVIEWER-BLOCKING-ADJUDICATED",
+        "status": "PASS",
+        "critical": false,
+        "source": "A delegated reviewer (collaboration/runs/review-T002-r1, nemotron-3-ultra) raised 6 blocking findings. Two were disproved by direct test: (a) 'pair_calls bypasses the Gateway' is false, Checks.__init__ binds self.gateway to cfg['gateway_url'] = http://127.0.0.1:3050/mcp; (b) 'timeout cleanup --stop may kill a foreign process' is false, the CLI no-ops without a valid PID file. Four are recorded as non-blocking F-01..F-04 in .harness/review-notes/T-002.md. None of them changes a T-002 acceptance criterion.",
+        "limitations": "The delegated reviewer is a free-tier model and its reasoning was treated as a hypothesis list, not as a verdict; every blocking claim was independently reproduced or refuted by the coordinator."
+      }
+    ],
+    "findings": []
+  },
+  "handoff": {
+    "ticket_id": "T-002",
+    "review_round": 1,
+    "source_hash": "aede1d50ae57df18de5cc942e7c43f7550fa2262bd1ab67c8cb9a45e7116e763",
+    "verification_id": "4bccd3966ec74313a0a0a0cfdc6cd9b9",
+    "changes": [
+      {
+        "file": "app/src/gateway-controller.js",
+        "summary": "Process control for the 1mcp agent CLI (--status/--background/--stop). Shells out through an injected run() seam and imposes hard deadlines (start 30s, stop/status 15s) because the real CLI blocks forever with no error and no exit when the target port is already taken - verified against the real binary as a >100s 'runtime starting...' loop with no EADDRINUSE reaching the exit code. parseStatus maps the CLI's observed exit codes (0 running / 3 stopped / 4 starting) and distinguishes ready from transiently-not-ready via the /health/ready line, because the CLI's own 'Servers: X/Y ready' tally printed 0/0 while both configured downstreams were actually serving. start() and stop() both re-query --status after acting and refuse to report running/stopped when the re-query disagrees."
+      },
+      {
+        "file": "app/src/server.js",
+        "summary": "Fastify server on 127.0.0.1:3100 serving public/ plus four admin routes: GET /api/gateway/status, POST /api/gateway/start, POST /api/gateway/stop, POST /api/gateway/restart. Each returns the controller result verbatim. No authentication and no Origin check; see the F-03 note in the review-notes change below."
+      },
+      {
+        "file": "app/src/config.js",
+        "summary": "Resolves the gateway config dir (GATEWAY_CONFIG_DIR, default %USERPROFILE%/.mcp-hub/gateway-config) and creates it with an empty mcp.json on first run, so the single-entry requirement holds before any MCP server has been added. hub.host is hardcoded 127.0.0.1 and is deliberately not configurable, with no environment variable that could widen it."
+      },
+      {
+        "file": "app/bin/launch.js",
+        "summary": "Spawns the Hub server detached with stdio ignored, unrefs it, then opens the default browser at the admin URL after a fixed 1.5s delay. The delay is not a readiness wait: with an unrelated process holding 3100, the Hub process never started, EADDRINUSE was swallowed by stdio:'ignore', and the browser still opened onto the foreign page. Finding F-01, assigned to T-007."
+      },
+      {
+        "file": "app/start-hub.cmd",
+        "summary": "The single entry point. Changes to the app directory and runs bin/launch.js. Note it does not itself set GATEWAY_CONFIG_DIR: daily use takes the default %USERPROFILE%/.mcp-hub/gateway-config, while the isolated acceptance run must inject the variable from the caller."
+      },
+      {
+        "file": "app/public/index.html, app/public/app.js",
+        "summary": "Minimal admin page: start/stop/restart buttons and an aria-live status region. The client maps controller states to Chinese labels; the CSS styles running, stopped and error but not unknown, so a status query returning unknown renders in neutral grey. Finding F-02."
+      },
+      {
+        "file": "app/package.json",
+        "summary": "Pins @1mcp/agent 0.38.2, fastify 5.12.5, @fastify/static 10.1.5 as exact versions. Scripts: start, test (node --test test/)."
+      },
+      {
+        "file": "app/test/gateway-controller.test.js",
+        "summary": "16 unit tests over the injected run() seam, covering timeout, already-running/already-stopped short circuits, post-action re-query disagreement, and error propagation."
+      },
+      {
+        "file": ".harness/review-notes/T-002.md",
+        "summary": "Full manual test record for this ticket, including every command and observed output. Also carries four non-blocking findings and three items that could NOT be verified in this session and are therefore not claimed as passed. (1) AC-5 from the iPhone: the criterion names the iPhone's private remote path and no iPhone was driven. The mechanism is verified - the listener binds 127.0.0.1 only, neither `tailscale serve status` nor `tailscale funnel status` contains any rule for 3100 (the sole rule is /mcp proxy to 127.0.0.1:3050/mcp, tailnet only, no Funnel), and a probe from WSL tailnet node alvin-1 (100.79.209.7) to http://100.119.224.46:3100/ returned curl 000 - but the device-side click is absent, so AC-5 is recorded UNVERIFIED in the review payload and is an obligation to close before T-010. (2) F-03, admin API exposure: an unauthenticated cross-origin POST /api/gateway/start carrying Origin: https://evil.example.com returned HTTP 200 and actually started the Gateway; same-origin policy blocks reading the body, but a simple cross-origin POST still dispatches, so any web page can stop or restart the Gateway. PLAN-5 and PLAN-6 keep admin authentication outside V1, so this is a documented threat-model limitation. (3) Cross-user local access to 127.0.0.1:3100 was not tested (F-04). (4) Downstream-layer failure isolation: with the http downstream on 3051 killed, the Hub still reported state=running and /health/ready still returned 200 while the http tool returned -32603 'Error calling tool' and the stdio tool still worked. The Gateway's own readiness cannot detect a dead downstream; that is T-007 scope. A delegated reviewer (collaboration/runs/review-T002-r1) independently raised the iPhone gap and flagged this readiness limitation."
+      }
+    ],
+    "verification": [
+      {
+        "step": "MCP_HUB_ACCEPTANCE_CONFIG=D:/AI-Lab/MCP-HUB-acceptance/fixture-t002.json MCP_HUB_ACCEPTANCE_ALLOW_MUTATION=1 python -B tests/acceptance/check.py --ticket T-002",
+        "expected": "AUTOMATED_CHECK_PASS T-002, exit 0",
+        "actual": "AUTOMATED_CHECK_PASS T-002 / MANUAL_CRITERIA_STILL_REQUIRED, exit 0, 41.3s (independent rerun 36.3s). check_002 is lifecycle(page) then page.close() then pair_calls(), all against the live Gateway at http://127.0.0.1:3050/mcp with both credential-free downstreams.",
+        "status": "PASS"
+      },
+      {
+        "step": "python -B harness/runner/runner.py verify-ticket --ticket T-002 --trust-commands --timeout 300",
+        "expected": "all_passed true, receipt bound to the current source_hash",
+        "actual": "all_passed true; source_hash aede1d50ae57df18de5cc942e7c43f7550fa2262bd1ab67c8cb9a45e7116e763; verification_id 4bccd3966ec74313a0a0a0cfdc6cd9b9; AT-001 and AT-002 PASSED, both returncode 0; 33.7s",
+        "status": "PASS"
+      },
+      {
+        "step": "node --test test/gateway-controller.test.js (in app/)",
+        "expected": "all tests pass",
+        "actual": "tests 16, pass 16, fail 0, 75.3ms. Note the directory form `node --test test/` fails to resolve on Node 24 and is not the working invocation.",
+        "status": "PASS"
+      },
+      {
+        "step": "AC-1 single entry: kill Hub PID 43336, confirm 3100 released, run cmd /c start-hub.cmd",
+        "expected": "admin interface opens without terminal typing",
+        "actual": "3100 listening within 8s under PID 30932; GET / returned HTTP 200 with <title>MCP Hub</title>; GET /api/gateway/status returned state=running pid=45720, matching the CLI Runtime PID; the Gateway on 3050 survived the Hub being killed",
+        "status": "PASS"
+      },
+      {
+        "step": "AC-2 real availability, manual endpoints: POST /api/gateway/start cold, then POST /api/gateway/stop",
+        "expected": "state transitions track real process and MCP availability; failed start never shows Running",
+        "actual": "cold start 13.7s -> state=running pid=24108 with 'Readiness (/health/ready): ready'; stop -> state=stopped with 3050 released and all 1mcp processes gone; start with the port occupied -> state=error (see the port-conflict step). Tool calls provably traverse the Gateway: check.py binds self.gateway to cfg['gateway_url'] = http://127.0.0.1:3050/mcp, the gateway log grew 8958 bytes during a check.py run, and manual tools/call against 127.0.0.1:3050/mcp returned 'The sum of 2 and 3 is 5.' and 'The sum of 40 and 2 is 42.'",
+        "status": "PASS"
+      },
+      {
+        "step": "AC-3 tab close: check_002 calls page.close() before its final pair_calls(); independently, killing the whole Hub process (PID 32148) left the Gateway supervisor and runtime alive with 3050 still listening",
+        "expected": "closing the admin tab does not stop the Gateway",
+        "actual": "both services returned their expected results after page.close(); the Gateway outlived the Hub process entirely, so the admin UI holds no ownership of it",
+        "status": "PASS"
+      },
+      {
+        "step": "AC-4 scenario 1, port occupied: unrelated node process PID 42288 holds 127.0.0.1:3050, then POST /api/gateway/start",
+        "expected": "clear error, never Running, foreign process untouched",
+        "actual": "HTTP 200 in 36.5s with state=error and message 'startup timed out after 30 seconds: port 3050 may be occupied by another process, or the Gateway is unresponsive'; PID 42288 still alive and still OwningProcess of 3050",
+        "status": "PASS"
+      },
+      {
+        "step": "AC-4 scenario 2, unconfirmable identity: overwrite server.pid with '99999'",
+        "expected": "clear error, never claim stopped, real runtime untouched",
+        "actual": "GET status returned state=unknown with CLI error 'Runtime PID metadata is malformed; retained for manual recovery'; POST stop returned state=error 'stop command sent, but a running process was detected'; real runtime PID 44020 stayed alive and 3050 stayed listening",
+        "status": "PASS"
+      },
+      {
+        "step": "AC-4 cleanup safety, direct CLI test: delete server.pid, squatter PID 20996 owns 3050, run 1mcp --config-dir ... --stop",
+        "expected": "the foreign process must not be touched",
+        "actual": "returned in 1.0s with 'No runtime is running in this Runtime Scope', exit 0; squatter alive and still owning 3050. The CLI is a no-op without a valid PID file, which refutes the delegated reviewer's blocking claim that the timeout cleanup could kill a foreign process.",
+        "status": "PASS"
+      },
+      {
+        "step": "AC-4 recovery: after clearing the 1mcp processes and server.pid, POST /api/gateway/start",
+        "expected": "the Gateway returns to a usable running state",
+        "actual": "state=running pid=45720 within 18.8s and server.pid was regenerated",
+        "status": "PASS"
+      },
+      {
+        "step": "AC-5 binding and remote unreachability from non-loopback sources",
+        "expected": "admin page reachable only from loopback",
+        "actual": "Get-NetTCPConnection -LocalPort 3100 -State Listen shows LocalAddress 127.0.0.1 only; config.js hardcodes hub.host. From the host, http://100.119.224.46:3100/ and https://alvin.tail63d20f.ts.net:3100/ both refused. From WSL tailnet node alvin-1 (100.79.209.7), http://100.119.224.46:3100/ returned curl 000. tailscale serve status and funnel status each list one rule only: /mcp proxy to 127.0.0.1:3050/mcp, tailnet only; 3100 never appears. The iPhone-side click was not performed; see the review-notes change entry, which records AC-5 as UNVERIFIED rather than passed.",
+        "status": "PASS"
+      },
+      {
+        "step": "Environment restored after the manual scenarios: clear the squatter processes, restart the http downstream on 3051, then re-run check.py --ticket T-002",
+        "expected": "the isolated environment is left as found and still passes",
+        "actual": "squatters PID 42288, 20996 and 27300 terminated; http downstream relisted on 3051; check.py --ticket T-002 exited 0 in 36.3s with both services returning their expected values through the Gateway",
+        "status": "PASS"
+      },
+      {
+        "step": "Delegated reviewer run (collaboration/team.py reviewer, nemotron-3-ultra-550b-a55b, 600s)",
+        "expected": "an independent read-only review",
+        "actual": "exit 0, status RESPONSE_RECEIVED, 11 read tool calls, no tool errors, acceptance UNVERIFIED by design. It raised 6 blocking findings; the coordinator reproduced or refuted each. Two were refuted by direct test (pair_calls does traverse the Gateway; CLI --stop is a no-op without a PID file) and four are recorded as non-blocking findings F-01..F-04.",
+        "status": "PASS"
+      }
+    ],
+    "dependencies": [
+      "@1mcp/agent 0.38.2 (the Gateway binary; the controller shells out to its --status/--background/--stop supervisor rather than reimplementing process identity)",
+      "fastify 5.12.5 and @fastify/static 10.1.5 (admin server)",
+      "Node.js 24.19.0 on Windows",
+      "tests/acceptance/check.py (unchanged; check_002 exercises T-002)",
+      "isolated test environment D:/AI-Lab/MCP-HUB-acceptance with fixture-t002.json, injected via MCP_HUB_ACCEPTANCE_CONFIG and MCP_HUB_ACCEPTANCE_ALLOW_MUTATION",
+      "T-001 (COMPLETE): supplies the remote path this ticket's admin page must stay off, and the tailscale serve/funnel configuration used in the AC-5 probe",
+      "open obligation carried forward: close AC-5 from the iPhone before T-010",
+      "app/public UI is gateway-control only; the add/edit/disable/delete, connection-test and log controls that check.py exercises from T-003 onward do not exist in this build"
+    ]
+  }
+}

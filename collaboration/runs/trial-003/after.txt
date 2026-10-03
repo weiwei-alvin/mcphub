@@ -1,0 +1,11 @@
+test_absolute_outside (test_bounded.ResolveInRootTest.test_absolute_outside) ... ok
+test_child (test_bounded.ResolveInRootTest.test_child) ... ok
+test_normalized_child (test_bounded.ResolveInRootTest.test_normalized_child) ... ok
+test_parent_traversal (test_bounded.ResolveInRootTest.test_parent_traversal) ... ok
+test_root_itself (test_bounded.ResolveInRootTest.test_root_itself) ... ok
+test_sibling_prefix_escape (test_bounded.ResolveInRootTest.test_sibling_prefix_escape) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.010s
+
+OK

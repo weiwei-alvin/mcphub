@@ -1,0 +1,20 @@
+test_absolute_outside (test_bounded.ResolveInRootTest.test_absolute_outside) ... ok
+test_child (test_bounded.ResolveInRootTest.test_child) ... ok
+test_normalized_child (test_bounded.ResolveInRootTest.test_normalized_child) ... ok
+test_parent_traversal (test_bounded.ResolveInRootTest.test_parent_traversal) ... ok
+test_root_itself (test_bounded.ResolveInRootTest.test_root_itself) ... ok
+test_sibling_prefix_escape (test_bounded.ResolveInRootTest.test_sibling_prefix_escape) ... FAIL
+
+======================================================================
+FAIL: test_sibling_prefix_escape (test_bounded.ResolveInRootTest.test_sibling_prefix_escape)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\AI-Lab\MCP HUB\collaboration\runs\trial-003\test_bounded.py", line 50, in test_sibling_prefix_escape
+    with self.assertRaises(ValueError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.012s
+
+FAILED (failures=1)

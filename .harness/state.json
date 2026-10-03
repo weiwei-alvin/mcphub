@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.1",
+  "project_status": "IN_PROGRESS",
+  "pipeline_stage": "IMPLEMENTATION",
+  "stage_status": "IN_PROGRESS",
+  "active_ticket_id": "T-003",
+  "pause": null,
+  "tickets": {
+    "T-001": {
+      "status": "COMPLETE",
+      "review_attempts": 0,
+      "active_findings": [],
+      "verification": {
+        "path": "verifications/0e3d7856b7db4620be736e7fd8c5c7cc.json",
+        "sha256": "0314875292da1139fb57cf31dbffb25e0dfc94f757ca740e42e3e6583afb9281"
+      },
+      "review_total": 1,
+      "review_history": [
+        {
+          "path": "reviews/cf6fd3e4eb514f56907448a558437d2c.json",
+          "sha256": "23264e3f4bc83eadcf1a2a361b588962815d872da4caa1be4a26567364ccc89c"
+        }
+      ]
+    },
+    "T-002": {
+      "status": "COMPLETE",
+      "review_attempts": 0,
+      "active_findings": [],
+      "verification": {
+        "path": "verifications/cdeb0a47e34543b68496626f36d6076c.json",
+        "sha256": "9515f85d388b9bc6340cd3787d469ba44f79610a445de9aa432801ffa8f6a1d4"
+      },
+      "review_total": 1,
+      "review_history": [
+        {
+          "path": "reviews/abee61ec688a40f8874a7494ae15eb1e.json",
+          "sha256": "efca2d7d608787d4517979c420c835a04c492419ef7e941528688a3f89ecbffb"
+        }
+      ]
+    },
+    "T-003": {
+      "status": "IN_PROGRESS",
+      "review_attempts": 0,
+      "active_findings": []
+    },
+    "T-004": {
+      "status": "TODO",
+      "review_attempts": 0,
+      "active_findings": []
+    },
+    "T-005": {
+      "status": "TODO",
+      "review_attempts": 0,
+      "active_findings": []
+    },
+    "T-006": {
+      "status": "TODO",
+      "review_attempts": 0,
+      "active_findings": []
+    },
+    "T-007": {
+      "status": "TODO",
+      "review_attempts": 0,
+      "active_findings": []
+    },
+    "T-008": {
+      "status": "TODO",
+      "review_attempts": 0,
+      "active_findings": []
+    },
+    "T-009": {
+      "status": "TODO",
+      "review_attempts": 0,
+      "active_findings": []
+    },
+    "T-010": {
+      "status": "TODO",
+      "review_attempts": 0,
+      "active_findings": []
+    },
+    "T-011": {
+      "status": "TODO",
+      "review_attempts": 0,
+      "active_findings": []
+    }
+  },
+  "findings": {},
+  "approved_plan": {
+    "sha256": "86173c5490a4dfd0b0d2828631b60feef125f5fdb7ca6d8647aa92ea6d358aa4"
+  }
+}

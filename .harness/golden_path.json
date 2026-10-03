@@ -1,0 +1,229 @@
+{
+  "steps": [
+    {
+      "id": "AT-001",
+      "description": "iPhone 經私人單一入口呼叫兩種 MCP",
+      "user_story_ids": [
+        "US-12",
+        "US-15"
+      ],
+      "ticket_ids": [
+        "T-001"
+      ],
+      "verification_command": [
+        "python",
+        "-B",
+        "tests/acceptance/check.py",
+        "--ticket",
+        "T-001"
+      ],
+      "expected_output": "AUTOMATED_CHECK_PASS T-001"
+    },
+    {
+      "id": "AT-002",
+      "description": "從本機單一入口安全控制 Gateway",
+      "user_story_ids": [
+        "US-01",
+        "US-05",
+        "US-06"
+      ],
+      "ticket_ids": [
+        "T-002"
+      ],
+      "verification_command": [
+        "python",
+        "-B",
+        "tests/acceptance/check.py",
+        "--ticket",
+        "T-002"
+      ],
+      "expected_output": "AUTOMATED_CHECK_PASS T-002"
+    },
+    {
+      "id": "AT-003",
+      "description": "從管理頁新增並安全套用 MCP",
+      "user_story_ids": [
+        "US-02",
+        "US-07",
+        "US-08"
+      ],
+      "ticket_ids": [
+        "T-003"
+      ],
+      "verification_command": [
+        "python",
+        "-B",
+        "tests/acceptance/check.py",
+        "--ticket",
+        "T-003"
+      ],
+      "expected_output": "AUTOMATED_CHECK_PASS T-003"
+    },
+    {
+      "id": "AT-004",
+      "description": "編輯既有 MCP 並持久生效",
+      "user_story_ids": [
+        "US-03"
+      ],
+      "ticket_ids": [
+        "T-004"
+      ],
+      "verification_command": [
+        "python",
+        "-B",
+        "tests/acceptance/check.py",
+        "--ticket",
+        "T-004"
+      ],
+      "expected_output": "AUTOMATED_CHECK_PASS T-004"
+    },
+    {
+      "id": "AT-005",
+      "description": "停用 MCP 並阻止後續呼叫",
+      "user_story_ids": [
+        "US-04"
+      ],
+      "ticket_ids": [
+        "T-005"
+      ],
+      "verification_command": [
+        "python",
+        "-B",
+        "tests/acceptance/check.py",
+        "--ticket",
+        "T-005"
+      ],
+      "expected_output": "AUTOMATED_CHECK_PASS T-005"
+    },
+    {
+      "id": "AT-006",
+      "description": "刪除 MCP 設定並阻止後續呼叫",
+      "user_story_ids": [
+        "US-04"
+      ],
+      "ticket_ids": [
+        "T-006"
+      ],
+      "verification_command": [
+        "python",
+        "-B",
+        "tests/acceptance/check.py",
+        "--ticket",
+        "T-006"
+      ],
+      "expected_output": "AUTOMATED_CHECK_PASS T-006"
+    },
+    {
+      "id": "AT-007",
+      "description": "顯示下游檢查結果並主動測試連線",
+      "user_story_ids": [
+        "US-09",
+        "US-10"
+      ],
+      "ticket_ids": [
+        "T-007"
+      ],
+      "verification_command": [
+        "python",
+        "-B",
+        "tests/acceptance/check.py",
+        "--ticket",
+        "T-007"
+      ],
+      "expected_output": "AUTOMATED_CHECK_PASS T-007"
+    },
+    {
+      "id": "AT-008",
+      "description": "唯讀查看 Gateway 日誌",
+      "user_story_ids": [
+        "US-11"
+      ],
+      "ticket_ids": [
+        "T-008"
+      ],
+      "verification_command": [
+        "python",
+        "-B",
+        "tests/acceptance/check.py",
+        "--ticket",
+        "T-008"
+      ],
+      "expected_output": "AUTOMATED_CHECK_PASS T-008"
+    },
+    {
+      "id": "AT-009",
+      "description": "限定檔案 MCP 的實際操作範圍",
+      "user_story_ids": [
+        "US-14"
+      ],
+      "ticket_ids": [
+        "T-009"
+      ],
+      "verification_command": [
+        "python",
+        "-B",
+        "tests/acceptance/check.py",
+        "--ticket",
+        "T-009"
+      ],
+      "expected_output": "AUTOMATED_CHECK_PASS T-009"
+    },
+    {
+      "id": "AT-010",
+      "description": "iPhone 使用管理後的服務並於離線後恢復",
+      "user_story_ids": [
+        "US-12",
+        "US-13",
+        "US-15"
+      ],
+      "ticket_ids": [
+        "T-010"
+      ],
+      "verification_command": [
+        "python",
+        "-B",
+        "tests/acceptance/check.py",
+        "--ticket",
+        "T-010"
+      ],
+      "expected_output": "AUTOMATED_CHECK_PASS T-010"
+    },
+    {
+      "id": "AT-011",
+      "description": "完成 V1 整合驗收並交付證據",
+      "user_story_ids": [
+        "US-01",
+        "US-02",
+        "US-03",
+        "US-04",
+        "US-05",
+        "US-06",
+        "US-07",
+        "US-08",
+        "US-09",
+        "US-10",
+        "US-11",
+        "US-12",
+        "US-13",
+        "US-14",
+        "US-15"
+      ],
+      "ticket_ids": [
+        "T-011"
+      ],
+      "verification_command": [
+        "python",
+        "-B",
+        "tests/acceptance/check.py",
+        "--ticket",
+        "T-011"
+      ],
+      "expected_output": "AUTOMATED_CHECK_PASS T-011"
+    }
+  ],
+  "source_hash_exclude": [],
+  "env_passthrough": [
+    "MCP_HUB_ACCEPTANCE_CONFIG",
+    "MCP_HUB_ACCEPTANCE_ALLOW_MUTATION"
+  ]
+}

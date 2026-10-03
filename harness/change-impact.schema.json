@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "change-impact.schema.json",
+  "title": "Change Impact Payload",
+  "description": "Structured payload analyzing the effect of an upstream document (PLAN.md / SPEC.md / a Ticket) change, per Harness main document, section 10 (Change Impact Handling).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["change_type", "source", "affected_tickets"],
+  "properties": {
+    "change_type": {
+      "type": "string",
+      "enum": ["NON_BEHAVIORAL", "BEHAVIORAL"],
+      "description": "NON_BEHAVIORAL changes (wording, formatting, non-behavioral clarification) must not auto-invalidate downstream Tickets."
+    },
+    "source": {
+      "type": "string",
+      "description": "Which upstream document changed, e.g. 'SPEC.md'."
+    },
+    "affected_tickets": {
+      "type": "array",
+      "description": "Every V1 Ticket that traces to the changed item, even if the action is NONE.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["ticket_id", "action"],
+        "properties": {
+          "ticket_id": { "type": "string", "pattern": "^T-[0-9]{3,}$" },
+          "action": {
+            "type": "string",
+            "enum": ["NONE", "IMPACTED", "INVALIDATED"],
+            "description": "INVALIDATED only applies to a Ticket that was already COMPLETE and whose completion condition no longer holds."
+          },
+          "reason": { "type": "string" }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "change_type": { "const": "NON_BEHAVIORAL" } }, "required": ["change_type"] },
+      "then": {
+        "properties": {
+          "affected_tickets": {
+            "items": { "properties": { "action": { "const": "NONE" } } }
+          }
+        }
+      }
+    }
+  ]
+}

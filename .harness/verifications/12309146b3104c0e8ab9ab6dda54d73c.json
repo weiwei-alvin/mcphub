@@ -1,0 +1,25 @@
+{
+  "ticket_id": "T-002",
+  "review_round": 1,
+  "source_hash": "d049fb3f8f644830ca938fbf9b666476fed1a9fce959b6157708f5e99433c5d7",
+  "verification_id": "fcb33c121f464c09a206525e182e0f36",
+  "all_passed": false,
+  "results": [
+    {
+      "step_id": "AT-001",
+      "status": "FAILED",
+      "stdout": "",
+      "stderr": "CHECK_FAILED T-001: URLError; inspect the isolated test environment\n",
+      "returncode": 1,
+      "error": "CHECK_FAILED T-001: URLError; inspect the isolated test environment\n"
+    },
+    {
+      "step_id": "AT-002",
+      "status": "FAILED",
+      "stdout": "",
+      "stderr": "CHECK_FAILED T-002: Error; inspect the isolated test environment\n",
+      "returncode": 1,
+      "error": "CHECK_FAILED T-002: Error; inspect the isolated test environment\n"
+    }
+  ]
+}

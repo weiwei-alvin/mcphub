@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "finding.schema.json",
+  "title": "Finding Payload",
+  "description": "One blocking (or non-blocking) finding submitted by REVIEW as part of review-result.schema.json. This is the payload shape a Reviewer submits, which is distinct from the persisted finding record in state.schema.json (ticket_id, status, first_detected_attempt, last_seen_attempt, reopen_count) that the Runner computes and maintains. The Runner matches submitted findings to persisted ones by (ticket_id, finding_key) to decide OPEN / RESOLVED / REOPENED per Harness main document section 8.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["finding_key", "criterion_ref", "description", "blocking"],
+  "properties": {
+    "finding_key": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Stable slug identifying the same underlying issue across Review attempts for one Ticket, e.g. 'missing-null-check-login'. The Reviewer must reuse the same key across attempts if the issue is unresolved or reopened, and use a new key for a genuinely different issue."
+    },
+    "criterion_ref": {
+      "type": "string",
+      "description": "The Acceptance Criterion this finding relates to."
+    },
+    "description": {
+      "type": "string"
+    },
+    "blocking": {
+      "type": "boolean",
+      "description": "Non-blocking findings are recorded but do not by themselves prevent a PASS verdict."
+    },
+    "evidence": {
+      "type": "string"
+    }
+  }
+}

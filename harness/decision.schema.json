@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "decision.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "decision_ref",
+    "pause_id",
+    "reason",
+    "ticket_id",
+    "pipeline_stage",
+    "options",
+    "resolved",
+    "chosen_option",
+    "rationale",
+    "source",
+    "context"
+  ],
+  "properties": {
+    "decision_ref": {
+      "type": "string",
+      "pattern": "^DEC-[0-9]{3,}$"
+    },
+    "pause_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reason": {
+      "enum": [
+        "GATE_USER_DECISION_REQUIRED",
+        "REVIEW_USER_DECISION_REQUIRED",
+        "RETRY_LIMIT_REACHED",
+        "PLAN_CHANGE_REQUIRES_DECISION"
+      ]
+    },
+    "ticket_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "pipeline_stage": {
+      "type": "string"
+    },
+    "options": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "enum": [
+          "CONTINUE",
+          "FIX_REQUIRED"
+        ]
+      }
+    },
+    "resolved": {
+      "type": "boolean"
+    },
+    "chosen_option": {
+      "enum": [
+        "",
+        "CONTINUE",
+        "FIX_REQUIRED"
+      ]
+    },
+    "rationale": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "context": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "gate-result.schema.json#/$defs/decisionContext"
+        }
+      ]
+    },
+    "plan_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

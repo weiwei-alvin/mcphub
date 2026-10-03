@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gate-result.schema.json",
+  "title": "Gate Verdict Payload",
+  "description": "Structured payload an Agent submits for a DISCOVERY, SPEC or TICKETS Gate Check. The Runner validates this, checks it against the State Transition tables in the Harness main document, and only then updates state.json. This payload is never written directly into state.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "stage",
+    "verdict",
+    "criteria"
+  ],
+  "properties": {
+    "stage": {
+      "type": "string",
+      "enum": [
+        "DISCOVERY",
+        "SPEC",
+        "TICKETS"
+      ],
+      "description": "Which planning Stage this Gate Check evaluated."
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "FIX_REQUIRED",
+        "USER_DECISION_REQUIRED"
+      ]
+    },
+    "criteria": {
+      "type": "array",
+      "minItems": 1,
+      "description": "One entry per Acceptance Criterion defined in that Stage's Harness Rules doc.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Acceptance Criterion identifier, matching the IDs defined in that Stage's Harness Rules doc, e.g. 'PLAN-1', 'SPEC-1', 'TKT-1'."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PASS",
+              "FAIL",
+              "UNVERIFIED"
+            ]
+          },
+          "evidence": {
+            "type": "string",
+            "description": "Required when status is FAIL or UNVERIFIED."
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "FAIL",
+                    "UNVERIFIED"
+                  ]
+                }
+              },
+              "required": [
+                "status"
+              ]
+            },
+            "then": {
+              "required": [
+                "evidence"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "decision_context": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/decisionContext"
+        }
+      ],
+      "description": "Required when verdict = USER_DECISION_REQUIRED. The Runner writes this into .harness/decisions/DEC-<NNN>.md (see Harness main document, section 9 and 24)."
+    }
+  },
+  "$defs": {
+    "decisionContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "question",
+        "why_blocked",
+        "options"
+      ],
+      "properties": {
+        "question": {
+          "type": "string",
+          "description": "The decision the user needs to make."
+        },
+        "why_blocked": {
+          "type": "string",
+          "description": "Why the existing PLAN / SPEC / Ticket cannot answer this."
+        },
+        "options": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "label",
+              "impact"
+            ],
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "impact": {
+                "type": "string",
+                "description": "What choosing this option would change."
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "verdict": {
+            "const": "PASS"
+          }
+        },
+        "required": [
+          "verdict"
+        ]
+      },
+      "then": {
+        "properties": {
+          "criteria": {
+            "items": {
+              "properties": {
+                "status": {
+                  "const": "PASS"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "verdict": {
+            "const": "USER_DECISION_REQUIRED"
+          }
+        },
+        "required": [
+          "verdict"
+        ]
+      },
+      "then": {
+        "required": [
+          "decision_context"
+        ],
+        "properties": {
+          "decision_context": {
+            "$ref": "#/$defs/decisionContext"
+          }
+        }
+      }
+    }
+  ]
+}
