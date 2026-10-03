@@ -236,8 +236,12 @@ class ConfigStore {
       };
     }
 
-    const previous = this.effective();
-    const canRecover = Object.keys(previous.mcpServers || {}).length > 0;
+    // Recovery target is last-good, never "whatever was effective before": the
+    // effective file may itself be a version that never started (an earlier
+    // failed apply, a hand edit), and restoring it would report a recovery that
+    // did not happen.
+    const lastGood = this._readJson(this.lastGoodPath);
+    const canRecover = lastGood !== null;
     this._writeJson(this.effectivePath, this.draft());
 
     const after = await restart();
@@ -254,11 +258,11 @@ class ConfigStore {
         stage: 'apply',
         recovered: false,
         recoverable: false,
-        message: `${failure}。沒有可恢復的上一份設定（這是首次套用），Gateway 目前無法使用`,
+        message: `${failure}。沒有可恢復的上一份設定（尚無曾成功啟動的版本），Gateway 目前無法使用`,
       };
     }
 
-    this._writeJson(this.effectivePath, previous);
+    this._writeJson(this.effectivePath, lastGood);
     const recovered = await restart();
     if (recovered.state === 'running') {
       return {

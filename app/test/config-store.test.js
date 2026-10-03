@@ -189,6 +189,36 @@ assert.equal(outcome.recoverable, false);
     assert.ok(JSON.parse(fs.files[effectivePath]).mcpServers['old-good']);
   });
 
+  it('an effective config that never started is not treated as recoverable', async () => {
+    // Effective is non-empty but there is no last-good: e.g. an earlier apply
+    // failed after committing. Restoring it would fake a recovery.
+    const fs = fakeFs({
+      [effectivePath]: JSON.stringify({ mcpServers: { 'never-started': { type: 'stdio', command: 'node', args: [] } } }),
+    });
+    const store = makeStore(fs);
+    store.addService(STDIO);
+    let restarts = 0;
+    const outcome = await store.apply({ restart: async () => { restarts += 1; return failed('still broken'); } });
+    assert.equal(outcome.state, 'error');
+    assert.equal(outcome.recovered, false);
+    assert.equal(outcome.recoverable, false);
+    assert.equal(restarts, 1, 'no recovery restart may be attempted without a last-good version');
+  });
+
+  it('recovery restores last-good, not the previous effective config', async () => {
+    const good = { mcpServers: { 'old-good': { type: 'stdio', command: 'node', args: [] } } };
+    const fs = fakeFs({
+      [effectivePath]: JSON.stringify({ mcpServers: { 'never-started': { type: 'stdio', command: 'node', args: [] } } }),
+      [lastGoodPath]: JSON.stringify(good),
+    });
+    const store = makeStore(fs);
+    store.addService(STDIO);
+    const states = [failed('bad'), running];
+    const outcome = await store.apply({ restart: async () => states.shift() });
+    assert.equal(outcome.recovered, true);
+    assert.deepEqual(JSON.parse(fs.files[effectivePath]), good);
+  });
+
   it('a failed restart AND a failed recovery reports the service as unavailable with both failures', async () => {
     const fs = fakeFs({
       [effectivePath]: JSON.stringify({ mcpServers: { 'old-good': { type: 'stdio', command: 'node', args: [] } } }),

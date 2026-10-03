@@ -22,7 +22,7 @@
   };
 
   const TRANSPORT_TEXT = { stdio: 'stdio', streamableHttp: 'Streamable HTTP' };
-  const FIELD_ERRORS = ['name', 'transport', 'command', 'args', 'url'];
+  const FIELD_ERRORS = ['name', 'transport', 'command', 'args', 'url', 'form'];
 
   function render(result) {
     const text = result.state === 'error'
@@ -62,8 +62,9 @@
   }
 
   function showFieldError(field, message) {
-    const box = document.getElementById('error-' + field);
-    if (!box) return;
+    // A rejected field the form has no input for (e.g. a refused secret key)
+    // still has to be visible, so it falls back to the form-level message.
+    const box = document.getElementById('error-' + field) || document.getElementById('error-form');
     box.textContent = message;
     box.hidden = false;
   }
@@ -156,7 +157,14 @@
         applyStatusEl.textContent = '設定已套用';
         applyStatusEl.dataset.state = 'applied';
       } else {
-        applyStatusEl.textContent = '設定未套用';
+        // Distinct wording per outcome (US-08): none of these may read as success.
+        if (data.recovered === true) {
+          applyStatusEl.textContent = '新設定未套用，已回復舊設定';
+        } else if (data.stage === 'validation') {
+          applyStatusEl.textContent = '設定未套用（驗證失敗）';
+        } else {
+          applyStatusEl.textContent = '套用失敗，Gateway 目前無法使用';
+        }
         applyStatusEl.dataset.state = 'error';
         applyDetailEl.textContent = data.message || '套用失敗';
       }
