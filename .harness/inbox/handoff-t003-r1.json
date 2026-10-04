@@ -1,0 +1,79 @@
+{
+  "ticket_id": "T-003",
+  "review_round": 1,
+  "source_hash": "1ca4c1033e776efb65c44d3bf74cc0c8d9a10b4a0e6a681ad45d113f50b43e9a",
+  "verification_id": "6e1a80b4df7c4619ac34fcb9f5a75659",
+  "changes": [
+    {
+      "file": "app/src/config-store.js",
+      "summary": "Stores a draft separately from effective and last-good Gateway configuration; validates before apply; restores last-good after controlled restart failure and reports recovery state explicitly."
+    },
+    {
+      "file": "app/src/server.js",
+      "summary": "Provides real service list/add and config apply routes, returning field-level validation and non-success apply outcomes without false 2xx success."
+    },
+    {
+      "file": "app/public/index.html, app/public/app.js",
+      "summary": "Provides the MCP add form, transport-specific fields, explicit confirmation before apply, pending-change display, and visible validation/recovery messages."
+    },
+    {
+      "file": "app/src/config.js, app/src/gateway-controller.js",
+      "summary": "Raises Windows lifecycle deadlines to accommodate real @1mcp/agent process-identity checks; status timeout is configurable while ownership and post-action verification remain unchanged."
+    },
+    {
+      "file": "tests/acceptance/check.py",
+      "summary": "Fills transport-specific fields before clicking Add and allows the real Windows Gateway lifecycle enough time for T-003 browser acceptance."
+    }
+  ],
+  "verification": [
+    {
+      "step": "npm test (cwd=app)",
+      "expected": "All product unit tests pass.",
+      "actual": "39 tests passed, 0 failed.",
+      "status": "PASS"
+    },
+    {
+      "step": "python -B -m unittest discover -s tests/acceptance -p test_checker.py -v",
+      "expected": "Acceptance checker self-tests pass.",
+      "actual": "9 tests passed, 0 failed.",
+      "status": "PASS"
+    },
+    {
+      "step": "MCP_HUB_ACCEPTANCE_CONFIG=D:/AI-Lab/MCP-HUB-acceptance/fixture-t002.json MCP_HUB_ACCEPTANCE_ALLOW_MUTATION=1 python -B tests/acceptance/check.py --ticket T-003",
+      "expected": "Real UI adds stdio and HTTP services and real Gateway calls pass.",
+      "actual": "AUTOMATED_CHECK_PASS T-003; mcp.json contained one stdio and one HTTP service; test Gateway stopped cleanly afterward.",
+      "status": "PASS"
+    },
+    {
+      "step": "python -B harness/runner/runner.py verify-ticket --ticket T-003 --trust-commands --timeout 240",
+      "expected": "Receipt is bound to current source hash and all enabled AT steps pass.",
+      "actual": "AT-001, AT-002 and AT-003 all PASSED, returncode 0; verification_id 6e1a80b4df7c4619ac34fcb9f5a75659; source_hash 1ca4c1033e776efb65c44d3bf74cc0c8d9a10b4a0e6a681ad45d113f50b43e9a.",
+      "status": "PASS"
+    },
+    {
+      "step": "Playwright invalid-name form probe",
+      "expected": "Field error is visible and invalid draft does not change stored services.",
+      "actual": "VT02_INVALID_FORM_REJECTED_PRESERVED_DRAFT.",
+      "status": "PASS"
+    },
+    {
+      "step": "Controlled ConfigStore apply recovery matrix",
+      "expected": "Recovery success, recovery failure, and no-last-good branches are explicit and preserve the correct files/errors.",
+      "actual": "All three VT-03 markers passed against the real buildServer route and file store.",
+      "status": "PASS"
+    },
+    {
+      "step": "Playwright apply confirmation probe",
+      "expected": "Confirmation warns about restart/interruption; cancel sends no apply request.",
+      "actual": "VT03_APPLY_CONFIRM_TEXT_AND_CANCEL_NO_REQUEST.",
+      "status": "PASS"
+    }
+  ],
+  "dependencies": [
+    "@1mcp/agent 0.38.2",
+    "fastify 5.12.5 and @fastify/static 10.1.5",
+    "Node.js 24.19.0 on Windows",
+    "tests/acceptance/check.py and the external isolated fixture D:/AI-Lab/MCP-HUB-acceptance/fixture-t002.json",
+    "T-002 COMPLETE Gateway lifecycle controller and ownership checks"
+  ]
+}

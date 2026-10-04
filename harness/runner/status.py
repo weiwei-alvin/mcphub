@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from state_transition import active_tickets
 from traceability import TraceabilityManager, EntityType
 
 
@@ -86,6 +87,7 @@ class HarnessStatus:
             "pipeline_stage": state.get("pipeline_stage"),
             "stage_status": state.get("stage_status"),
             "active_ticket_id": state.get("active_ticket_id"),
+            "active_tickets": active_tickets(state),
             "pause": pause_info,
             "tickets": {
                 "total": total_tickets,
@@ -126,7 +128,9 @@ class HarnessStatus:
         # Project status
         print(f"\nProject Status: {status['project_status']}")
         print(f"Pipeline Stage: {status['pipeline_stage']} ({status['stage_status']})")
-        if status['active_ticket_id']:
+        if len(status['active_tickets']) > 1:
+            print(f"Active Tickets: {', '.join(status['active_tickets'])} (focus: {status['active_ticket_id']})")
+        elif status['active_ticket_id']:
             print(f"Active Ticket: {status['active_ticket_id']}")
         
         if status['pause']:

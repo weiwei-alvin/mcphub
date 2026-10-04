@@ -250,7 +250,11 @@ class Checks:
             browser = playwright.chromium.launch(headless=True)
             try:
                 page = browser.new_page()
-                page.set_default_timeout(15_000)
+                # The real @1mcp/agent lifecycle includes Windows process-identity
+                # checks and downstream startup. T-003 can legitimately take
+                # under a minute; a 15-second browser default made a live apply
+                # look like a product failure.
+                page.set_default_timeout(90_000)
                 page.on("dialog", lambda dialog: dialog.accept())
                 page.goto(url)
                 page.get_by_role("heading", name="MCP Hub", exact=True).wait_for()
@@ -275,7 +279,6 @@ class Checks:
         suffix = uuid.uuid4().hex[:10]
         for service in services:
             service["name"] = "mcp-hub-acceptance-" + suffix + "-" + service["transport"]
-            self.click(page, "新增 MCP Server")
             page.get_by_label("服務名稱", exact=True).fill(service["name"])
             page.get_by_label("傳輸類型", exact=True).select_option(service["transport"])
             if service["transport"] == "stdio":
@@ -283,6 +286,7 @@ class Checks:
                 page.get_by_label("命令參數", exact=True).fill(json.dumps(service["arguments"], ensure_ascii=False))
             else:
                 page.get_by_label("服務 URL", exact=True).fill(private_url(service["url"], loopback_only=True))
+            self.click(page, "新增 MCP Server")
             self.apply(page)
         page.reload()
         for service in services:

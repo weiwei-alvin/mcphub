@@ -12,7 +12,7 @@ import uuid
 from dependency_scheduler import DependencyScheduler
 from golden_path_verifier import GoldenPathVerifier
 from payload_validator import PayloadValidator
-from state_transition import create_initial_state, GateVerdict, PauseReason
+from state_transition import active_tickets, create_initial_state, GateVerdict, is_active, parallel_limit, PauseReason
 from storage import atomic_json, digest, plan_hash, source_hash
 from schema_validation import validator
 
@@ -80,7 +80,7 @@ class Workflow:
 
     def active(self,s,tid, ready=False):
         if s['project_status']!='IN_PROGRESS': raise ValueError('Project is not in progress')
-        if not tid or s['active_ticket_id']!=tid: raise ValueError('Wrong active ticket')
+        if not is_active(s,tid): raise ValueError('Wrong active ticket')
         t=s['tickets'][tid]
         allowed=('READY_FOR_REVIEW',) if ready else ('IN_PROGRESS','READY_FOR_REVIEW')
         if t['status'] not in allowed: raise ValueError('Ticket not ready for this operation')
@@ -125,6 +125,7 @@ class Workflow:
 
     def review(self,tid,verdict,review_path,handoff_path):
         s=self.state(); self.check_plan(s); t=self.active(s,tid,ready=True)
+        if parallel_limit(s)>1: s['active_ticket_id']=tid  # a pause raised below belongs to this ticket
         files=self.graph(s)
         if not review_path: raise ValueError('Missing review payload; PASS string is not evidence')
         review=json.loads(Path(review_path).read_text(encoding='utf-8'))
@@ -167,7 +168,9 @@ class Workflow:
                 s['final_verification']=self.artifact('verifications',dict(source_hash=current,**final))
             t['status']='COMPLETE'
             s['active_ticket_id']=None
+            others=[k for k in active_tickets(s) if k!=tid]
             if last: s.update(project_status='COMPLETE',pipeline_stage='REVIEW')
+            elif others: s['active_ticket_id']=others[0]  # parallel mode: other tickets keep running; start more explicitly
             else:
                 nxt=self.runner.dependency_scheduler.get_next_ticket(s,files)
                 if not nxt: raise ValueError('No executable next ticket; completion not committed')

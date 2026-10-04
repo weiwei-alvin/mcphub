@@ -42,6 +42,18 @@ function buildServer(config, { store = new ConfigStore({ configDir: config.gatew
     }
   });
 
+  fastify.put('/api/services/:name', async (request, reply) => {
+    try {
+      const service = store.updateService(request.params.name, request.body || {});
+      return reply.send({ service, services: store.list() });
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        return reply.code(400).send({ error: 'validation', field: error.field, message: error.message });
+      }
+      throw error;
+    }
+  });
+
   // 409 rather than 200 for every non-applied outcome: a failed apply is not a
   // successful request, and the client must not treat a 2xx as "applied".
   fastify.post('/api/config/apply', async (request, reply) => {

@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from jsonschema import validate, ValidationError, Draft202012Validator
+from state_transition import active_tickets, is_active
 
 HARNESS_DIR = Path(".harness")
 SCHEMA_DIR = Path("harness")
@@ -126,10 +127,10 @@ class PayloadValidator:
 
         # Check ticket_id matches active ticket
         payload_ticket = payload.get("ticket_id")
-        active_ticket = state.get("active_ticket_id")
-        if payload_ticket != active_ticket:
+        active = active_tickets(state)
+        if not is_active(state, payload_ticket):
             errors.append(
-                f"Ticket mismatch: payload targets '{payload_ticket}' but active ticket is '{active_ticket}'"
+                f"Ticket mismatch: payload targets '{payload_ticket}' but active ticket is '{', '.join(active) or None}'"
             )
 
         # Check ticket is in IMPLEMENTATION or REVIEW stage
@@ -186,10 +187,10 @@ class PayloadValidator:
 
         # Check ticket_id matches active ticket
         payload_ticket = payload.get("ticket_id")
-        active_ticket = state.get("active_ticket_id")
-        if payload_ticket != active_ticket:
+        active = active_tickets(state)
+        if not is_active(state, payload_ticket):
             errors.append(
-                f"Ticket mismatch: payload targets '{payload_ticket}' but active ticket is '{active_ticket}'"
+                f"Ticket mismatch: payload targets '{payload_ticket}' but active ticket is '{', '.join(active) or None}'"
             )
 
         # Check ticket is IN_PROGRESS or READY_FOR_REVIEW

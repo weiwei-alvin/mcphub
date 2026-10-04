@@ -191,6 +191,29 @@ class ConfigStore {
     return service;
   }
 
+  updateService(name, input) {
+    const draft = this.draft();
+    const servers = { ...(draft.mcpServers || {}) };
+    const existing = servers[name];
+    if (!isPlainObject(existing)) {
+      throw new ValidationError('name', '服務不存在，無法編輯');
+    }
+    if (input && input.name !== undefined && input.name !== name) {
+      throw new ValidationError('name', '編輯不可變更服務名稱');
+    }
+
+    // The path parameter is the identity of the row.  Re-validating the full
+    // replacement keeps an invalid edit from reaching the draft file, while
+    // excluding the target from duplicate detection permits its unchanged name.
+    const service = validateService({ ...(input || {}), name }, new Set(Object.keys(servers).filter((key) => key !== name)));
+    // Keep this forward-compatible with the later disable flow: editing a
+    // disabled row must not silently re-enable it.
+    service.disabled = existing.disabled === true;
+    servers[name] = service;
+    this._writeJson(this.draftPath, { ...draft, mcpServers: servers });
+    return service;
+  }
+
   // Every stored service is re-validated, not just the one being added, so a
   // hand-edited mcp.json cannot smuggle an invalid or credential-bearing entry
   // into the effective config through the apply path.

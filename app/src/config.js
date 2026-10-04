@@ -35,8 +35,12 @@ function loadConfig() {
       port: Number(env('GATEWAY_PORT', 3050)),
       configDir: path.resolve(configDir),
       oneMcpEntry: require.resolve('@1mcp/agent/build/index.js'),
-      startTimeoutMs: Number(env('GATEWAY_START_TIMEOUT_MS', 30_000)),
-      stopTimeoutMs: Number(env('GATEWAY_STOP_TIMEOUT_MS', 15_000)),
+      // On Windows, @1mcp/agent verifies process identity through short-lived
+      // PowerShell calls. A real start/stop can therefore exceed the old
+      // 30/15-second bounds even when the Gateway is healthy.
+      startTimeoutMs: Number(env('GATEWAY_START_TIMEOUT_MS', 60_000)),
+      stopTimeoutMs: Number(env('GATEWAY_STOP_TIMEOUT_MS', 30_000)),
+      statusTimeoutMs: Number(env('GATEWAY_STATUS_TIMEOUT_MS', 30_000)),
     },
   };
 }

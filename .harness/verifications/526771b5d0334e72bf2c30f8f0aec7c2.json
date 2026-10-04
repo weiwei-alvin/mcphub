@@ -1,0 +1,33 @@
+{
+  "ticket_id": "T-003",
+  "review_round": 1,
+  "source_hash": "1ca4c1033e776efb65c44d3bf74cc0c8d9a10b4a0e6a681ad45d113f50b43e9a",
+  "verification_id": "a4dd2b114c50480eaa6642786ae0b571",
+  "all_passed": false,
+  "results": [
+    {
+      "step_id": "AT-001",
+      "status": "FAILED",
+      "stdout": "",
+      "stderr": "CHECK_FAILED T-001: AssertionError; inspect the isolated test environment\n",
+      "returncode": 1,
+      "error": "CHECK_FAILED T-001: AssertionError; inspect the isolated test environment\n"
+    },
+    {
+      "step_id": "AT-002",
+      "status": "FAILED",
+      "stdout": "",
+      "stderr": "CHECK_FAILED T-002: AssertionError; inspect the isolated test environment\n",
+      "returncode": 1,
+      "error": "CHECK_FAILED T-002: AssertionError; inspect the isolated test environment\n"
+    },
+    {
+      "step_id": "AT-003",
+      "status": "FAILED",
+      "stdout": "",
+      "stderr": "CHECK_FAILED T-003: AssertionError; inspect the isolated test environment\n",
+      "returncode": 1,
+      "error": "CHECK_FAILED T-003: AssertionError; inspect the isolated test environment\n"
+    }
+  ]
+}

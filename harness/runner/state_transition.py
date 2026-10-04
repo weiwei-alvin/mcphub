@@ -75,6 +75,42 @@ class TransitionResult:
     error: Optional[str] = None
 
 
+# ============================================================
+# PARALLEL TICKETS
+# ============================================================
+# max_parallel_tickets absent or 1: exactly one active ticket, named by
+# active_ticket_id (original behaviour). Above 1: every IN_PROGRESS or
+# READY_FOR_REVIEW ticket is active, and active_ticket_id is only the focus
+# ticket that pause/decision/resume operate on.
+
+ACTIVE_STATUSES = ("IN_PROGRESS", "READY_FOR_REVIEW")
+
+
+def parallel_limit(state: Dict) -> int:
+    return state.get("max_parallel_tickets", 1)
+
+
+def active_tickets(state: Dict) -> List[str]:
+    if parallel_limit(state) > 1:
+        return sorted(t for t, x in state.get("tickets", {}).items() if x["status"] in ACTIVE_STATUSES)
+    return [state["active_ticket_id"]] if state.get("active_ticket_id") else []
+
+
+def is_active(state: Dict, ticket_id: str) -> bool:
+    return bool(ticket_id) and ticket_id in active_tickets(state)
+
+
+def start_block_reason(state: Dict, ticket_id: str) -> Optional[str]:
+    """Why ticket_id may not become active now, or None."""
+    others = [t for t in active_tickets(state) if t != ticket_id]
+    limit = parallel_limit(state)
+    if limit == 1:
+        return f"Another ticket {others[0]} is active" if others else None
+    if len(others) >= limit:
+        return f"Parallel limit {limit} reached: {', '.join(others)} active"
+    return None
+
+
 class StateTransitionEngine:
     """
     Enforces all valid state transitions for the Harness.
@@ -281,9 +317,9 @@ class StateTransitionEngine:
         # This requires ticket files - for now we check state only
         # Full implementation would read .harness/tickets/T-<NNN>.md
 
-        # Check no other active ticket
-        if state.get("active_ticket_id") and state["active_ticket_id"] != ticket_id:
-            return TransitionResult(False, error=f"Another ticket {state['active_ticket_id']} is active")
+        blocked = start_block_reason(state, ticket_id)
+        if blocked:
+            return TransitionResult(False, error=blocked)
 
         new_state = self._deep_copy_state(state)
         new_state["tickets"][ticket_id]["status"] = TicketStatus.IN_PROGRESS.value
@@ -299,7 +335,7 @@ class StateTransitionEngine:
         if ticket_id not in tickets:
             return TransitionResult(False, error=f"Ticket {ticket_id} not found")
 
-        if state.get("active_ticket_id") != ticket_id:
+        if not is_active(state, ticket_id):
             return TransitionResult(False, error=f"Ticket {ticket_id} is not active")
 
         ticket = tickets[ticket_id]
@@ -373,12 +409,30 @@ class StateTransitionEngine:
         if TicketStatus.IN_PROGRESS not in self.TICKET_TRANSITIONS.get(current_status, []):
             return TransitionResult(False, error=f"Cannot resume ticket from {current_status.value}")
 
-        if state.get("active_ticket_id"):
-            return TransitionResult(False, error=f"Another ticket {state['active_ticket_id']} is active")
+        blocked = start_block_reason(state, ticket_id)
+        if blocked:
+            return TransitionResult(False, error=blocked)
 
         new_state = self._deep_copy_state(state)
         new_state["tickets"][ticket_id]["status"] = TicketStatus.IN_PROGRESS.value
         new_state["active_ticket_id"] = ticket_id
+        return TransitionResult(True, new_state)
+
+    def set_max_parallel(self, state: Dict, limit: int) -> TransitionResult:
+        """Set how many tickets may be active at once (1 restores single-ticket mode)."""
+        if state["project_status"] != ProjectStatus.IN_PROGRESS.value:
+            return TransitionResult(False, error="Project is not in progress")
+        if not isinstance(limit, int) or isinstance(limit, bool) or limit < 1:
+            return TransitionResult(False, error="max_parallel_tickets must be an integer >= 1")
+        current = sorted(t for t, x in state.get("tickets", {}).items() if x["status"] in ACTIVE_STATUSES)
+        if len(current) > limit:
+            return TransitionResult(False, error=f"{len(current)} tickets are active ({', '.join(current)}); finish some before lowering the limit to {limit}")
+        new_state = self._deep_copy_state(state)
+        if limit == 1:
+            new_state.pop("max_parallel_tickets", None)
+            new_state["active_ticket_id"] = current[0] if current else None
+        else:
+            new_state["max_parallel_tickets"] = limit
         return TransitionResult(True, new_state)
 
     # ============================================================
@@ -393,7 +447,7 @@ class StateTransitionEngine:
         if ticket_id not in tickets:
             return TransitionResult(False, error=f"Ticket {ticket_id} not found")
 
-        if state.get("active_ticket_id") != ticket_id:
+        if not is_active(state, ticket_id):
             return TransitionResult(False, error=f"Ticket {ticket_id} is not active")
 
         ticket = tickets[ticket_id]

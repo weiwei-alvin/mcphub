@@ -59,7 +59,12 @@
           "pattern": "^T-[0-9]{3,}$"
         }
       ],
-      "description": "Currently active Ticket. Must be null outside IMPLEMENTATION and REVIEW."
+      "description": "Currently active Ticket. Must be null outside IMPLEMENTATION and REVIEW. When max_parallel_tickets > 1 this is only the focus ticket for pause/decision/resume; every IN_PROGRESS or READY_FOR_REVIEW ticket is active."
+    },
+    "max_parallel_tickets": {
+      "type": "integer",
+      "minimum": 2,
+      "description": "Optional. How many tickets may be IN_PROGRESS or READY_FOR_REVIEW at once. Absent means 1 (single active ticket, original behaviour)."
     },
     "pause": {
       "oneOf": [

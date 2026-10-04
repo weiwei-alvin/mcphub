@@ -38,7 +38,7 @@
 
     <form id="service-form">
       <fieldset>
-        <legend>新增 MCP Server</legend>
+        <legend id="service-form-legend">新增 MCP Server</legend>
 
         <label for="field-name">服務名稱</label>
         <input id="field-name" name="name" autocomplete="off" />
@@ -69,14 +69,14 @@
 
         <p class="field-error" id="error-form" role="alert" hidden></p>
 
-        <button type="submit">新增 MCP Server</button>
+        <button type="submit" id="service-submit">新增 MCP Server</button>
       </fieldset>
     </form>
 
     <table>
       <caption>已設定的 MCP Server</caption>
       <thead>
-        <tr><th scope="col">名稱</th><th scope="col">傳輸</th></tr>
+        <tr><th scope="col">名稱</th><th scope="col">傳輸</th><th scope="col">操作</th></tr>
       </thead>
       <tbody id="service-rows"></tbody>
     </table>

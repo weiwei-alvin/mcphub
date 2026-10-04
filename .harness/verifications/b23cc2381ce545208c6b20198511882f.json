@@ -1,0 +1,33 @@
+{
+  "ticket_id": "T-003",
+  "review_round": 1,
+  "source_hash": "c274c2fe39ac2978f24dfd3a103ae0d2762e55732fafda82d48fad879ec7be52",
+  "verification_id": "f2ebff4296224a8c8d0aa29ec434c7a7",
+  "all_passed": false,
+  "results": [
+    {
+      "step_id": "AT-001",
+      "status": "FAILED",
+      "stdout": "",
+      "stderr": "UNVERIFIED: explicit isolated fixture file missing; no service contacted\n",
+      "returncode": 2,
+      "error": "UNVERIFIED: explicit isolated fixture file missing; no service contacted\n"
+    },
+    {
+      "step_id": "AT-002",
+      "status": "FAILED",
+      "stdout": "",
+      "stderr": "UNVERIFIED: explicit isolated fixture file missing; no service contacted\n",
+      "returncode": 2,
+      "error": "UNVERIFIED: explicit isolated fixture file missing; no service contacted\n"
+    },
+    {
+      "step_id": "AT-003",
+      "status": "FAILED",
+      "stdout": "",
+      "stderr": "UNVERIFIED: explicit isolated fixture file missing; no service contacted\n",
+      "returncode": 2,
+      "error": "UNVERIFIED: explicit isolated fixture file missing; no service contacted\n"
+    }
+  ]
+}

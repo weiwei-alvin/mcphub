@@ -263,3 +263,42 @@ assert.equal(outcome.recoverable, false);
     assert.ok(outcome.message.includes('憑證或秘密欄位'), outcome.message);
   });
 });
+
+describe('ConfigStore.updateService', () => {
+  it('updates only the selected draft service and leaves effective config untouched', () => {
+    const fs = fakeFs({ [effectivePath]: JSON.stringify({ mcpServers: {} }) });
+    const store = makeStore(fs);
+    store.addService(STDIO);
+    store.addService(HTTP);
+    const updated = store.updateService('demo-http', {
+      name: 'demo-http',
+      transport: 'http',
+      url: 'http://127.0.0.1:3052/mcp',
+    });
+
+    assert.equal(updated.url, 'http://127.0.0.1:3052/mcp');
+    const draft = JSON.parse(fs.files[draftPath]).mcpServers;
+    assert.equal(draft['demo-http'].url, 'http://127.0.0.1:3052/mcp');
+    assert.equal(draft['demo-stdio'].command, 'node');
+    assert.equal(JSON.parse(fs.files[effectivePath]).mcpServers['demo-http'], undefined);
+  });
+
+  it('rejects an invalid edit without changing the draft', () => {
+    const fs = fakeFs({ [effectivePath]: JSON.stringify({ mcpServers: {} }) });
+    const store = makeStore(fs);
+    store.addService(HTTP);
+    const before = fs.files[draftPath];
+    assert.throws(() => store.updateService('demo-http', {
+      name: 'demo-http',
+      transport: 'http',
+      url: 'http://127.0.0.1:3052/mcp?token=blocked',
+    }), ValidationError);
+    assert.equal(fs.files[draftPath], before);
+  });
+
+  it('rejects edits to an unknown service', () => {
+    const fs = fakeFs({ [effectivePath]: JSON.stringify({ mcpServers: {} }) });
+    const store = makeStore(fs);
+    assert.throws(() => store.updateService('missing', HTTP), ValidationError);
+  });
+});

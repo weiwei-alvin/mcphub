@@ -3,7 +3,7 @@
   "project_status": "IN_PROGRESS",
   "pipeline_stage": "IMPLEMENTATION",
   "stage_status": "IN_PROGRESS",
-  "active_ticket_id": "T-003",
+  "active_ticket_id": "T-004",
   "pause": null,
   "tickets": {
     "T-001": {
@@ -39,14 +39,29 @@
       ]
     },
     "T-003": {
-      "status": "IN_PROGRESS",
+      "status": "COMPLETE",
       "review_attempts": 0,
-      "active_findings": []
+      "active_findings": [],
+      "verification": {
+        "path": "verifications/f2a22557b88846388c1f3ff3ae258dd0.json",
+        "sha256": "9eb59b320bcd979b5b0ad21d7f175b959d023c0e64501f173279ca04b03843fe"
+      },
+      "review_total": 1,
+      "review_history": [
+        {
+          "path": "reviews/61d15118df4841d3a16a40c4ada0d9cc.json",
+          "sha256": "29f64a4761768b98fa86d62139562f9f3fbfc164984233f30948322994fead69"
+        }
+      ]
     },
     "T-004": {
-      "status": "TODO",
+      "status": "IN_PROGRESS",
       "review_attempts": 0,
-      "active_findings": []
+      "active_findings": [],
+      "verification": {
+        "path": "verifications/1a32f421cde84c8db44e0a9876084a11.json",
+        "sha256": "f3d8baaf08df9982d54500b704e8a2a08ca512345d1cbd4f4e78d9d4c6a4e974"
+      }
     },
     "T-005": {
       "status": "TODO",

@@ -67,7 +67,7 @@ class GatewayController {
     port,
     startTimeoutMs = 30_000,
     stopTimeoutMs = 15_000,
-    statusTimeoutMs = 15_000, // observed: first spawn after a fresh npm install can take ~10s (AV scan on new files)
+    statusTimeoutMs = 30_000, // Windows process-identity checks can take several seconds per PID
     run = runOneMcp,
   }) {
     if (!oneMcpEntry) throw new Error('oneMcpEntry is required');

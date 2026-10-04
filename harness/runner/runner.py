@@ -26,7 +26,7 @@ from state_transition import (
     StateTransitionEngine,
     ProjectStatus, PipelineStage, StageStatus,
     TicketStatus, FindingStatus, ReviewVerdict, GateVerdict, PauseReason,
-    create_initial_state
+    create_initial_state, active_tickets, parallel_limit, start_block_reason
 )
 from dependency_scheduler import DependencyScheduler
 
@@ -138,9 +138,9 @@ class HarnessRunner:
         if ticket["status"] in [TicketStatus.IN_PROGRESS.value, TicketStatus.COMPLETE.value, TicketStatus.INVALIDATED.value]:
             return False, f"Ticket {ticket_id} already {ticket['status']}"
 
-        # Check no other active ticket
-        if state.get("active_ticket_id") and state["active_ticket_id"] != ticket_id:
-            return False, f"Another ticket {state['active_ticket_id']} is active"
+        blocked = start_block_reason(state, ticket_id)
+        if blocked:
+            return False, blocked
 
         # Check stage
         if state["pipeline_stage"] not in [PipelineStage.IMPLEMENTATION.value, PipelineStage.REVIEW.value]:
@@ -235,6 +235,8 @@ class HarnessRunner:
             "pipeline_stage": state["pipeline_stage"],
             "stage_status": state["stage_status"],
             "active_ticket_id": state["active_ticket_id"],
+            "active_tickets": active_tickets(state),
+            "max_parallel_tickets": parallel_limit(state),
             "pause": state.get("pause"),
             "tickets": state["tickets"],
             "findings": state["findings"]
@@ -252,7 +254,8 @@ def main():
         "gate-verdict", "review-verdict", "ready-for-review",
         "set-ready-for-gate", "mark-ticket-ready-for-review",
         "executable-tickets", "next-ticket", "blocked-tickets", "validate-deps",
-        "fix-loop-memory", "update-fix-memory", "init", "verify-ticket", "snapshot", "decide"
+        "fix-loop-memory", "update-fix-memory", "init", "verify-ticket", "snapshot", "decide",
+        "set-max-parallel"
     ])
     parser.add_argument("--ticket", help="Ticket ID")
     parser.add_argument("--reason", help="Pause reason")
@@ -269,6 +272,7 @@ def main():
     parser.add_argument("--option")
     parser.add_argument("--rationale")
     parser.add_argument("--source")
+    parser.add_argument("--max-parallel", type=int)
     args = parser.parse_args()
     runner = HarnessRunner(args.project_root)
     from workflow import Workflow
@@ -405,6 +409,23 @@ def main():
         else:
             print(f"Failed: {result.error}", file=sys.stderr)
             sys.exit(1)
+
+    elif args.command == "set-max-parallel":
+        if args.max_parallel is None:
+            print("--max-parallel required", file=sys.stderr)
+            sys.exit(1)
+        state = runner.read_state()
+        if not state:
+            print("No valid state", file=sys.stderr)
+            sys.exit(1)
+        result = runner.transition_engine.set_max_parallel(state, args.max_parallel)
+        if not result.success:
+            print(f"Failed: {result.error}", file=sys.stderr)
+            sys.exit(1)
+        if not runner.write_state_atomic(result.new_state):
+            print("Failed to write state", file=sys.stderr)
+            sys.exit(1)
+        print(f"max_parallel_tickets set to {args.max_parallel}")
 
     elif args.command == "mark-ticket-ready-for-review":
         if not args.ticket:

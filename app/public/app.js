@@ -23,6 +23,7 @@
 
   const TRANSPORT_TEXT = { stdio: 'stdio', streamableHttp: 'Streamable HTTP' };
   const FIELD_ERRORS = ['name', 'transport', 'command', 'args', 'url', 'form'];
+  let editingName = null;
 
   function render(result) {
     const text = result.state === 'error'
@@ -77,6 +78,31 @@
 
   form.elements.transport.addEventListener('change', toggleTransportFields);
 
+  function clearForm() {
+    editingName = null;
+    form.elements.name.disabled = false;
+    document.getElementById('service-form-legend').textContent = '新增 MCP Server';
+    document.getElementById('service-submit').textContent = '新增 MCP Server';
+    form.elements.name.value = '';
+    form.elements.command.value = '';
+    form.elements.args.value = '';
+    form.elements.url.value = '';
+  }
+
+  function beginEdit(service) {
+    editingName = service.name;
+    form.elements.name.value = service.name;
+    form.elements.name.disabled = true;
+    form.elements.transport.value = service.transport === 'streamableHttp' ? 'http' : service.transport;
+    form.elements.command.value = service.command || '';
+    form.elements.args.value = Array.isArray(service.args) ? JSON.stringify(service.args) : '';
+    form.elements.url.value = service.url || '';
+    document.getElementById('service-form-legend').textContent = '編輯 MCP Server';
+    document.getElementById('service-submit').textContent = '更新 MCP Server';
+    toggleTransportFields();
+    form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
   function renderServices(services) {
     rowsEl.replaceChildren();
     for (const service of services) {
@@ -85,7 +111,13 @@
       name.textContent = service.name;
       const transport = document.createElement('td');
       transport.textContent = TRANSPORT_TEXT[service.transport] || service.transport;
-      row.append(name, transport);
+      const actions = document.createElement('td');
+      const edit = document.createElement('button');
+      edit.type = 'button';
+      edit.textContent = '編輯';
+      edit.addEventListener('click', () => beginEdit(service));
+      actions.append(edit);
+      row.append(name, transport, actions);
       rowsEl.append(row);
     }
   }
@@ -102,10 +134,7 @@
     }
   }
 
-  form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    clearFieldErrors();
-
+  function formPayload() {
     const transport = form.elements.transport.value;
     const payload = { name: form.elements.name.value, transport };
     if (transport === 'stdio') {
@@ -114,8 +143,37 @@
     } else {
       payload.url = form.elements.url.value;
     }
+    return payload;
+  }
+
+  async function saveEdit() {
+    const name = editingName;
+    const response = await fetch('/api/services/' + encodeURIComponent(name), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formPayload()),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      showFieldError(data.field, data.message || '編輯失敗');
+      return false;
+    }
+    renderServices(data.services || []);
+    clearForm();
+    await refreshServices();
+    return true;
+  }
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    clearFieldErrors();
 
     try {
+      if (editingName) {
+        await saveEdit();
+        return;
+      }
+      const payload = formPayload();
       const response = await fetch('/api/services', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -127,10 +185,7 @@
         return;
       }
       renderServices(data.services);
-      form.elements.name.value = '';
-      form.elements.command.value = '';
-      form.elements.args.value = '';
-      form.elements.url.value = '';
+      clearForm();
       await refreshServices();
     } catch (error) {
       applyStatusEl.textContent = '無法連線到 MCP Hub 後端';
@@ -151,6 +206,11 @@
     applyDetailEl.textContent = '';
 
     try {
+      if (editingName && !(await saveEdit())) {
+        applyStatusEl.textContent = '變更未儲存，設定未套用';
+        applyStatusEl.dataset.state = 'error';
+        return;
+      }
       const response = await fetch('/api/config/apply', { method: 'POST' });
       const data = await response.json();
       if (data.state === 'applied') {
