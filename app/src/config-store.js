@@ -214,6 +214,32 @@ class ConfigStore {
     return service;
   }
 
+  disableService(name, disabled = true) {
+    const draft = this.draft();
+    const servers = { ...(draft.mcpServers || {}) };
+    const existing = servers[name];
+    if (!isPlainObject(existing)) {
+      throw new ValidationError('name', '服務不存在，無法變更停用狀態');
+    }
+    if (typeof disabled !== 'boolean') {
+      throw new ValidationError('disabled', '停用狀態必須是布林值');
+    }
+    const service = { ...existing, disabled };
+    servers[name] = service;
+    this._writeJson(this.draftPath, { ...draft, mcpServers: servers });
+    return { name, ...service };
+  }
+
+  deleteService(name) {
+    const draft = this.draft();
+    const servers = { ...(draft.mcpServers || {}) };
+    if (!isPlainObject(servers[name])) {
+      throw new ValidationError('name', '服務不存在，無法刪除');
+    }
+    delete servers[name];
+    this._writeJson(this.draftPath, { ...draft, mcpServers: servers });
+  }
+
   // Every stored service is re-validated, not just the one being added, so a
   // hand-edited mcp.json cannot smuggle an invalid or credential-bearing entry
   // into the effective config through the apply path.

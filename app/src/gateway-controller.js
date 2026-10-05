@@ -65,6 +65,7 @@ class GatewayController {
     configDir,
     host,
     port,
+    logFile,
     startTimeoutMs = 30_000,
     stopTimeoutMs = 15_000,
     statusTimeoutMs = 30_000, // Windows process-identity checks can take several seconds per PID
@@ -77,6 +78,7 @@ class GatewayController {
     this.configDir = configDir;
     this.host = host;
     this.port = port;
+    this.logFile = logFile;
     this.startTimeoutMs = startTimeoutMs;
     this.stopTimeoutMs = stopTimeoutMs;
     this.statusTimeoutMs = statusTimeoutMs;
@@ -93,10 +95,12 @@ class GatewayController {
     const current = await this.status();
     if (current.state === 'running') return current;
 
+    const startArgs = ['--background', '--host', this.host, '--port', String(this.port)];
+    if (this.logFile) startArgs.push('--log-file', this.logFile);
     const result = await this._run(
       this.entry,
       this.configDir,
-      ['--background', '--host', this.host, '--port', String(this.port)],
+      startArgs,
       { timeoutMs: this.startTimeoutMs },
     );
 

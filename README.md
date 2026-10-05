@@ -11,9 +11,9 @@ version: 1.0.0
 
 MCP Hub 是為單一使用者規劃的 MCP 管理工具，目標是把分散的服務設定、啟停操作與日誌集中到一個本機介面，並讓使用者在外出時，仍能從 iPhone 的 Open Minis 經單一入口使用不同 MCP 工具。
 
-**目前處於實作階段。** T-001（iPhone 經私人單一入口呼叫兩種 MCP）與 T-002（本機單一入口安全控制 Gateway）已通過驗收與審查；T-003 起尚未實作。完整範圍與驗收條件以 [PLAN.md](PLAN.md) 為準，各工單的實際進度以 `.harness/state.json` 為權威來源（摘要見 [TICKETS.md](TICKETS.md)）。
+**目前處於實作與驗收階段。** T-001、T-002、T-003 已有既有驗收紀錄；T-004 至 T-009 的管理功能、健康檢查、日誌與檔案驗收契約已加入目前工作版本，但尚未以正式隔離 fixture 完成各張工單的產品驗收。T-010／T-011 仍需要真實 iPhone、行動網路與 Tailscale 證據。完整範圍與驗收條件以 [PLAN.md](PLAN.md) 為準，各工單的實際進度以 `.harness/state.json` 為權威來源（摘要見 [TICKETS.md](TICKETS.md)）。
 
-已交付部分：`app/` 底下的本機管理介面（單一啟動入口 `app/start-hub.cmd`、Gateway 啟停／重啟、狀態顯示）。管理頁僅供本機存取，MCP 設定的CRUD、下游連線檢查與日誌檢視尚未實作。
+已交付部分：`app/` 底下的本機管理介面（單一啟動入口 `app/start-hub.cmd`、Gateway 啟停／重啟、服務 CRUD、明確套用與恢復、下游 MCP 連線檢查、唯讀日誌檢視）。管理頁仍僅供本機存取；檔案範圍與 iPhone/Tailscale 仍須依隔離環境及實機驗收契約驗證。
 
 ## 適合誰
 

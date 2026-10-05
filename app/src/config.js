@@ -34,6 +34,7 @@ function loadConfig() {
       host: env('GATEWAY_HOST', '127.0.0.1'),
       port: Number(env('GATEWAY_PORT', 3050)),
       configDir: path.resolve(configDir),
+      logFile: path.resolve(env('GATEWAY_LOG_PATH', path.join(configDir, 'gateway.log'))),
       oneMcpEntry: require.resolve('@1mcp/agent/build/index.js'),
       // On Windows, @1mcp/agent verifies process identity through short-lived
       // PowerShell calls. A real start/stop can therefore exceed the old

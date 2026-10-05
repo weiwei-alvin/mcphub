@@ -76,15 +76,20 @@
     <table>
       <caption>已設定的 MCP Server</caption>
       <thead>
-        <tr><th scope="col">名稱</th><th scope="col">傳輸</th><th scope="col">操作</th></tr>
+        <tr><th scope="col">名稱</th><th scope="col">傳輸</th><th scope="col">狀態</th><th scope="col">連線狀態</th><th scope="col">操作</th></tr>
       </thead>
       <tbody id="service-rows"></tbody>
     </table>
+
+    <p>「可連線」表示最近一次 MCP 握手與工具清單檢查成功，不代表每個工具都已執行成功。</p>
 
     <p id="draft-status" hidden></p>
     <button type="button" id="apply-config">儲存並套用</button>
     <p role="status" id="apply-status" aria-live="polite"></p>
     <p id="apply-detail"></p>
+
+    <button type="button" id="show-logs">查看日誌</button>
+    <pre id="gateway-log" role="log" aria-live="polite" hidden></pre>
   </section>
 
   <script src="app.js"></script>
