@@ -164,7 +164,11 @@
       check.textContent = '測試連線';
       check.addEventListener('click', async () => {
         try {
-          const response = await fetch('/api/services/' + encodeURIComponent(service.name) + '/check', { method: 'POST' });
+          const response = await fetch('/api/services/' + encodeURIComponent(service.name) + '/check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({}),
+          });
           const data = await response.json();
           if (!response.ok) throw new Error(data.message || '連線檢查失敗');
           await refreshServices();

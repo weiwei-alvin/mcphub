@@ -28,6 +28,10 @@ test('service UI exposes per-service health and timestamp contract', () => {
   assert.match(appJs, /\/check/);
 });
 
+test('service health check sends an explicit empty JSON body', () => {
+  assert.match(appJs, /method: 'POST',\s+headers: \{ 'Content-Type': 'application\/json' \},\s+body: JSON\.stringify\(\{\}\)/);
+});
+
 test('service UI exposes a read-only log panel contract', () => {
   assert.match(html, /查看日誌/);
   assert.match(appJs, /role/);
