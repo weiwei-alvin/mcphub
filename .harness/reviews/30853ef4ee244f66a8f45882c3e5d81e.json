@@ -1,0 +1,151 @@
+{
+  "review": {
+    "ticket_id": "T-006",
+    "verdict": "PASS",
+    "review_round": 1,
+    "source_hash": "e4a2cd9e8f4d8a5f007535cfd854b675d89dd635b230f66a03fbb50a2a9a6445",
+    "verification_id": "ab20695405754e1885d89335e45061df",
+    "criteria": [
+      {
+        "id": "AT-001",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt ab20695405754e1885d89335e45061df reports AT-001 PASSED with returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/8ec7f44f631a43008d8ac46702db1197.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-002",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt ab20695405754e1885d89335e45061df reports AT-002 PASSED with returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/8ec7f44f631a43008d8ac46702db1197.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-003",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt ab20695405754e1885d89335e45061df reports AT-003 PASSED with returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/8ec7f44f631a43008d8ac46702db1197.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-004",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt ab20695405754e1885d89335e45061df reports AT-004 PASSED with returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/8ec7f44f631a43008d8ac46702db1197.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-005",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt ab20695405754e1885d89335e45061df reports AT-005 PASSED with returncode 0 (disable path still green).",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/8ec7f44f631a43008d8ac46702db1197.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-006",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt ab20695405754e1885d89335e45061df reports AT-006 PASSED with returncode 0; the isolated runtime deleted the HTTP service, reloaded, confirmed the row is gone, got an explicit rejection for its tool call, and confirmed the other service still works.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/8ec7f44f631a43008d8ac46702db1197.json",
+        "limitations": "The receipt states manual criteria are still required; the manual criteria below supply the missing review evidence."
+      },
+      {
+        "id": "AC-DELETE-APPLY",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "The management page deleted the draft row for the target service and '儲存並套用' succeeded; after page.reload the deleted service was no longer listed.",
+        "source": "app/public/app.js (mutateService DELETE fix); tests/acceptance/check.py check_006 remove_or_disable(delete=True); receipt 8ec7f44f631a43008d8ac46702db1197.json",
+        "limitations": "Verified through the isolated loopback fixture; no production service was deleted."
+      },
+      {
+        "id": "AC-DELETE-TARGET-DENIED",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "After deletion the target tool call returned isError:true with a message containing 'disabled' ('Server is disabled: <service> is not configured (removed or unknown)...'); it is a structured explicit denial, not a Gateway-wide failure.",
+        "source": "node_modules/@1mcp/agent/build/sdk/legacy/server/protocol/toolRequestHandlers.js (T-005/T-006 server-level disabled/removed branch); receipt 8ec7f44f631a43008d8ac46702db1197.json (AT-006)",
+        "limitations": "The denial wording is provided by the patched @1mcp handler; a tool whose prefix matches a configured-but-enabled server still returns the original JSON-RPC error and stays distinguishable."
+      },
+      {
+        "id": "AC-OTHER-SERVICE-OK",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "After the delete/apply/reload sequence the unchanged stdio service remained callable and returned the expected get-sum result in the same isolated run.",
+        "source": "tests/acceptance/check.py remove_or_disable; receipt 8ec7f44f631a43008d8ac46702db1197.json (AT-006)",
+        "limitations": "The unaffected service is the isolated stdio fixture required by the acceptance contract."
+      },
+      {
+        "id": "AC-DOWNSTREAM-PRESERVED",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "Delete only removes the Hub configuration entry; the downstream HTTP and stdio processes continued serving during and after the delete/apply/reload sequence (the other service call succeeded after deletion), and no downstream files or data were removed.",
+        "source": "tests/acceptance/check.py check_006; isolated runtime D:/AI-Lab/MCP-HUB-acceptance/followup-20261011-t005-formal-09",
+        "limitations": "Confirms the isolated test downstreams were untouched; it is not an exhaustive filesystem audit of every downstream."
+      }
+    ],
+    "findings": []
+  },
+  "handoff": {
+    "ticket_id": "T-006",
+    "review_round": 1,
+    "source_hash": "e4a2cd9e8f4d8a5f007535cfd854b675d89dd635b230f66a03fbb50a2a9a6445",
+    "verification_id": "ab20695405754e1885d89335e45061df",
+    "changes": [
+      {
+        "file": "app/public/app.js",
+        "summary": "Fixed mutateService so it only sends Content-Type: application/json when a request body exists. DELETE (no body) previously sent that header and Fastify rejected it with 400 FST_ERR_CTP_EMPTY_JSON_BODY, so the management-page delete button never took effect."
+      },
+      {
+        "file": "node_modules/@1mcp/agent/build/sdk/legacy/server/protocol/toolRequestHandlers.js",
+        "summary": "Extended the CallTool Unknown-tool branch: besides configured-but-disabled servers, a tool whose server prefix is no longer configured (deleted/removed) now returns an explicit isError result whose message contains 'disabled', instead of a bare 'Unknown tool'. Tools whose prefix matches a configured-but-enabled server still return the original JSON-RPC error."
+      },
+      {
+        "file": "patches/@1mcp+agent+0.38.2.patch",
+        "summary": "Updated the toolRequestHandlers hunk to match the extended branch; validated with git apply --check against pristine @1mcp/agent 0.38.2."
+      }
+    ],
+    "verification": [
+      {
+        "step": "python -B harness/runner/runner.py verify-ticket --ticket T-006 --trust-commands --timeout 400",
+        "expected": "AT-001 through AT-006 all PASSED with returncode 0 and a source-hash-bound receipt.",
+        "actual": "all_passed=true; AT-001..AT-006 PASSED; verification_id ab20695405754e1885d89335e45061df; source_hash e4a2cd9e8f4d8a5f007535cfd854b675d89dd635b230f66a03fbb50a2a9a6445.",
+        "status": "PASS"
+      },
+      {
+        "step": "C:\\Users\\m8508\\mcphub\\app: npm test",
+        "expected": "All product unit tests pass, including the public-contract tests for the delete/mutate flow.",
+        "actual": "76/76 passed.",
+        "status": "PASS"
+      },
+      {
+        "step": "Playwright UI delete probe (probe-uidelete3.py) against the isolated Hub",
+        "expected": "Clicking 刪除 with the confirm accepted removes the row and updates hub-draft.json.",
+        "actual": "row count 1 -> 0 and hub-draft.json no longer contains the deleted service.",
+        "status": "PASS"
+      },
+      {
+        "step": "DELETE /api/services/<name> with and without Content-Type: application/json",
+        "expected": "No-body DELETE must succeed.",
+        "actual": "with Content-Type returned 400 FST_ERR_CTP_EMPTY_JSON_BODY (the bug); after the fix the UI no longer sends it and GET/PATCH/POST keep their bodies.",
+        "status": "PASS"
+      },
+      {
+        "step": "git apply --check patches/@1mcp+agent+0.38.2.patch on pristine @1mcp/agent 0.38.2",
+        "expected": "Patch applies cleanly.",
+        "actual": "exit 0.",
+        "status": "PASS"
+      }
+    ],
+    "dependencies": [
+      "@1mcp/agent 0.38.2 (with the T-005/T-006 toolRequestHandlers patch)",
+      "fastify 5.12.5 and @fastify/static 10.1.5",
+      "Node.js 24.19.0 on Windows",
+      "tests/acceptance/check.py and the isolated T-006 fixture D:/AI-Lab/MCP-HUB-acceptance/followup-20261011-t005-formal-09/fixture.json",
+      "T-003 COMPLETE ConfigStore and management-page service lifecycle"
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "decision_ref": "DEC-001",
+  "pause_id": "fbab28345cd345a8a18736315992f0ff",
+  "reason": "REVIEW_USER_DECISION_REQUIRED",
+  "ticket_id": "T-010",
+  "pipeline_stage": "IMPLEMENTATION",
+  "options": [
+    "FIX_REQUIRED"
+  ],
+  "resolved": false,
+  "chosen_option": "",
+  "rationale": "",
+  "source": "",
+  "context": null
+}

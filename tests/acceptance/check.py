@@ -138,9 +138,20 @@ class MCP:
         deadline = time.monotonic() + 20
         data, consumed = [], 0
         while time.monotonic() < deadline:
-            raw = response.readline(65_537)
-            require(raw and len(raw) <= 65_536, "SSE ended without a bounded response")
-            consumed += len(raw)
+            # A single SSE data line can legitimately exceed the transport
+            # read size when Gateway instructions/tools are aggregated. Read
+            # bounded chunks until the line terminator, while keeping the
+            # total response bounded.
+            parts = []
+            while True:
+                chunk = response.readline(65_537)
+                require(chunk, "SSE ended without a bounded response")
+                consumed += len(chunk)
+                require(consumed <= 1_048_576, "SSE response exceeds probe limit")
+                parts.append(chunk)
+                if chunk.endswith(b"\n"):
+                    break
+            raw = b"".join(parts)
             require(consumed <= 1_048_576, "SSE response exceeds probe limit")
             line = raw.decode("utf-8").rstrip("\r\n")
             if line.startswith("data:"):
@@ -252,9 +263,9 @@ class Checks:
                 page = browser.new_page()
                 # The real @1mcp/agent lifecycle includes Windows process-identity
                 # checks and downstream startup. T-003 can legitimately take
-                # under a minute; a 15-second browser default made a live apply
-                # look like a product failure.
-                page.set_default_timeout(90_000)
+                # under two minutes; Windows process-identity checks and Docker
+                # downstream startup can exceed the old 90-second bound.
+                page.set_default_timeout(180_000)
                 page.on("dialog", lambda dialog: dialog.accept())
                 page.goto(url)
                 page.get_by_role("heading", name="MCP Hub", exact=True).wait_for()
@@ -272,6 +283,7 @@ class Checks:
 
     def apply(self, page):
         self.click(page, "儲存並套用")
+        page.get_by_role("status").filter(has_text="套用中…").wait_for()
         page.get_by_role("status").filter(has_text="設定已套用").wait_for()
 
     def add_pair(self, page):
@@ -279,6 +291,9 @@ class Checks:
         suffix = uuid.uuid4().hex[:10]
         for service in services:
             service["name"] = "mcp-hub-acceptance-" + suffix + "-" + service["transport"]
+            # The editor is intentionally collapsed in the production UI. Open
+            # it through the stable acceptance button before filling fields.
+            self.click(page, "新增 MCP Server")
             page.get_by_label("服務名稱", exact=True).fill(service["name"])
             page.get_by_label("傳輸類型", exact=True).select_option(service["transport"])
             if service["transport"] == "stdio":
@@ -286,7 +301,12 @@ class Checks:
                 page.get_by_label("命令參數", exact=True).fill(json.dumps(service["arguments"], ensure_ascii=False))
             else:
                 page.get_by_label("服務 URL", exact=True).fill(private_url(service["url"], loopback_only=True))
-            self.click(page, "新增 MCP Server")
+            page.locator("#service-form").get_by_role("button", name="新增 MCP Server", exact=True).click()
+            # The submit handler performs an async POST and refresh. Do not race
+            # the apply action against that mutation; wait for the real row and
+            # for the editor's close transition before restarting the Gateway.
+            self.row(page, service).wait_for()
+            page.locator("#service-editor").wait_for(state="hidden")
             self.apply(page)
         page.reload()
         for service in services:
@@ -304,10 +324,10 @@ class Checks:
         # against the real @1mcp/agent CLI it took 10-16s for a 2-service fixture,
         # tight against the page's 15s default. Widened explicitly for this one
         # external-process wait; other UI waits keep the inherited 15s default.
-        page.get_by_role("status").filter(has_text="Gateway 運作中").wait_for(timeout=30_000)
+        page.get_by_role("status").filter(has_text="Gateway 運作中").wait_for(timeout=180_000)
         self.pair_calls(services, endpoint)
         self.click(page, "重啟 Gateway")
-        page.get_by_role("status").filter(has_text="Gateway 運作中").wait_for(timeout=30_000)
+        page.get_by_role("status").filter(has_text="Gateway 運作中").wait_for(timeout=180_000)
         self.pair_calls(services, endpoint)
 
     def edit(self, page, services):

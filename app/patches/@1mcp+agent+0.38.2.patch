@@ -1,0 +1,65 @@
+diff --git a/node_modules/@1mcp/agent/build/core/server/backgroundRuntimeSupervisor.js b/node_modules/@1mcp/agent/build/core/server/backgroundRuntimeSupervisor.js
+index f3362ac..6cac559 100644
+--- a/node_modules/@1mcp/agent/build/core/server/backgroundRuntimeSupervisor.js
++++ b/node_modules/@1mcp/agent/build/core/server/backgroundRuntimeSupervisor.js
+@@ -93,7 +93,7 @@ export async function runBackgroundRuntimeSupervisor(options, dependencies) {
+     try {
+         persist({ status: 'starting' });
+         for (;;) {
+-            const worker = spawnWorker(options.workerCommand, workerArgs, { stdio: 'ignore' });
++            const worker = spawnWorker(options.workerCommand, workerArgs, { stdio: 'ignore', windowsHide: true });
+             const exitPromise = waitForWorkerExit(worker, now);
+             if (!worker.pid) {
+                 throw new Error('Background Runtime Supervisor failed to spawn a runtime worker');
+diff --git a/node_modules/@1mcp/agent/build/core/server/processIdentity.js b/node_modules/@1mcp/agent/build/core/server/processIdentity.js
+index 28008ef..d5bd9f3 100644
+--- a/node_modules/@1mcp/agent/build/core/server/processIdentity.js
++++ b/node_modules/@1mcp/agent/build/core/server/processIdentity.js
+@@ -55,6 +55,7 @@ export function readProcessIdentity(pid) {
+                 encoding: 'utf8',
+                 timeout: 3000,
+                 stdio: ['ignore', 'pipe', 'ignore'],
++                windowsHide: true,
+             })
+                 .trim();
+             return processIdentitySchema.parse({ platform: 'win32', hostname: os.hostname(), startTime });
+diff --git a/node_modules/@1mcp/agent/build/sdk/legacy/server/protocol/toolRequestHandlers.js b/node_modules/@1mcp/agent/build/sdk/legacy/server/protocol/toolRequestHandlers.js
+index b9aac44..8ae8e69 100644
+--- a/node_modules/@1mcp/agent/build/sdk/legacy/server/protocol/toolRequestHandlers.js
++++ b/node_modules/@1mcp/agent/build/sdk/legacy/server/protocol/toolRequestHandlers.js
+@@ -1,4 +1,4 @@
+-import { getConfiguredServerTargets } from '../../../../config/configuredServerTargets.js';
++import { getConfiguredServerTargets, isOperatorDisabledTemplateDefinition } from '../../../../config/configuredServerTargets.js';
+ import { InternalCapabilitiesProvider } from '../../../../core/capabilities/internalCapabilitiesProvider.js';
+ import { acquireRuntimeCapabilityCatalog } from '../../../../core/capabilities/runtimeCapabilityCatalog.js';
+ import { executeWithPostAuthOAuthRecovery } from '../../../../core/client/postAuthOAuthRecovery.js';
+@@ -63,6 +63,29 @@ export function registerToolHandlers(outboundConns, inboundConn, lazyLoadingOrch
+             const error = entry && getDisabledSourceToolError(serverConfigs, entry.route.server, entry.route.upstreamIdentity);
+             if (error)
+                 return structuredToolResult({ error });
++            // MCP Hub T-005/T-006: a server-level disabled OR removed/unconfigured
++            // server must surface an explicit denial containing "disabled"
++            // (isError + message), not a bare "Unknown tool".
++            // TODO: upstream should handle server-disabled at catalog/acquire layer.
++            const hubSepIndex = request.params.name.indexOf('_1mcp_');
++            const hubNamePrefix = hubSepIndex > 0 ? request.params.name.slice(0, hubSepIndex) : undefined;
++            const hubConfiguredPrefix = Object.keys(serverConfigs ?? {}).find((name) =>
++                request.params.name.startsWith(`${name}_1mcp_`));
++            const hubServerCfg = hubConfiguredPrefix ? serverConfigs[hubConfiguredPrefix] : undefined;
++            if (hubServerCfg && isOperatorDisabledTemplateDefinition(hubServerCfg)) {
++                return {
++                    isError: true,
++                    content: [{ type: 'text', text: `Server is disabled: ${hubConfiguredPrefix}. Re-enable it in config to use its tools.` }],
++                    structuredContent: { error: { type: 'not_found', message: `Server is disabled: ${hubConfiguredPrefix}. Re-enable it in config to use its tools.` } },
++                };
++            }
++            if (!hubServerCfg && hubNamePrefix) {
++                return {
++                    isError: true,
++                    content: [{ type: 'text', text: `Server is disabled: ${hubNamePrefix} is not configured (removed or unknown). Add it in config to use its tools.` }],
++                    structuredContent: { error: { type: 'not_found', message: `Server is disabled: ${hubNamePrefix} is not configured (removed or unknown). Add it in config to use its tools.` } },
++                };
++            }
+             throw new Error(`Unknown tool: ${request.params.name}`);
+         }
+         const { route } = resolved.entry;

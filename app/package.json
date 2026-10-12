@@ -7,11 +7,15 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@1mcp/agent": "0.38.2",
     "@fastify/static": "10.1.5",
     "fastify": "5.12.5"
+  },
+  "devDependencies": {
+    "patch-package": "8.0.1"
   }
 }

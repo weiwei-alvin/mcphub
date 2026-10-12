@@ -1,0 +1,41 @@
+{
+  "ticket_id": "T-004",
+  "review_round": 1,
+  "source_hash": "743aadd5c46ddee585fa4c397b274ad2a0a9d58b1c73d4bb307d3ab6a3445724",
+  "verification_id": "7fdb0ba39bc945eab1ddbc398837f8ae",
+  "all_passed": false,
+  "results": [
+    {
+      "step_id": "AT-001",
+      "status": "PASSED",
+      "stdout": "AUTOMATED_CHECK_PASS T-001\nMANUAL_CRITERIA_STILL_REQUIRED: this is not an iPhone or whole-ticket verdict\n",
+      "stderr": "",
+      "returncode": 0,
+      "error": null
+    },
+    {
+      "step_id": "AT-002",
+      "status": "PASSED",
+      "stdout": "AUTOMATED_CHECK_PASS T-002\nMANUAL_CRITERIA_STILL_REQUIRED: this is not an iPhone or whole-ticket verdict\n",
+      "stderr": "",
+      "returncode": 0,
+      "error": null
+    },
+    {
+      "step_id": "AT-003",
+      "status": "FAILED",
+      "stdout": "",
+      "stderr": "CHECK_FAILED T-003: TimeoutError; inspect the isolated test environment\n",
+      "returncode": 1,
+      "error": "CHECK_FAILED T-003: TimeoutError; inspect the isolated test environment\n"
+    },
+    {
+      "step_id": "AT-004",
+      "status": "PASSED",
+      "stdout": "AUTOMATED_CHECK_PASS T-004\nMANUAL_CRITERIA_STILL_REQUIRED: this is not an iPhone or whole-ticket verdict\n",
+      "stderr": "",
+      "returncode": 0,
+      "error": null
+    }
+  ]
+}

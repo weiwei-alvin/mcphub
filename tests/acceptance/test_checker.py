@@ -61,6 +61,20 @@ class CheckerTests(unittest.TestCase):
             with self.assertRaises(check.SetupError):
                 check.private_url(url, **options)
 
+    def test_add_pair_waits_for_async_form_submission(self):
+        source = Path(check.__file__).read_text(encoding="utf-8")
+        self.assertIn('self.row(page, service).wait_for()', source)
+        self.assertIn('page.locator("#service-editor").wait_for(state="hidden")', source)
+
+    def test_apply_waits_for_a_fresh_apply_transition(self):
+        source = Path(check.__file__).read_text(encoding="utf-8")
+        self.assertIn('has_text="套用中…"', source)
+
+    def test_browser_allows_real_gateway_restart_bound(self):
+        source = Path(check.__file__).read_text(encoding="utf-8")
+        self.assertIn("page.set_default_timeout(180_000)", source)
+        self.assertGreaterEqual(source.count("timeout=180_000"), 2)
+
     def test_json_and_sse_protocol_and_headers(self):
         for sse in [False, True]:
             client = check.MCP("http://127.0.0.1:1/mcp", ["2025-06-18"])
@@ -89,6 +103,12 @@ class CheckerTests(unittest.TestCase):
     def test_sse_without_matching_response_rejected(self):
         with self.assertRaises(AssertionError):
             check.MCP._sse_response(io.BytesIO(b'data: {"id":99}\n\n'), 1)
+
+    def test_sse_accepts_a_bounded_large_data_line(self):
+        payload = json.dumps({"jsonrpc": "2.0", "id": 1, "result": {"instructions": "x" * 70_000}}).encode()
+        response = io.BytesIO(b"data: " + payload + b"\n\n")
+        result = check.MCP._sse_response(response, 1)
+        self.assertEqual(result["id"], 1)
 
     def test_unsupported_negotiated_protocol_rejected(self):
         client = check.MCP("http://127.0.0.1:1/mcp", ["not-supported-by-double"])

@@ -1,0 +1,49 @@
+{
+  "ticket_id": "T-005",
+  "review_round": 1,
+  "source_hash": "b1d4f5a47878e8bdb52f377b2c7d47445d231689ce40218dd8d44cb7ac0293a2",
+  "verification_id": "e44eac200f7f498a8bc59a7fec8972e5",
+  "all_passed": false,
+  "results": [
+    {
+      "step_id": "AT-001",
+      "status": "FAILED",
+      "stdout": "",
+      "stderr": "CHECK_FAILED T-001: URLError; inspect the isolated test environment\n",
+      "returncode": 1,
+      "error": "CHECK_FAILED T-001: URLError; inspect the isolated test environment\n"
+    },
+    {
+      "step_id": "AT-002",
+      "status": "FAILED",
+      "stdout": "",
+      "stderr": "CHECK_FAILED T-002: Error; inspect the isolated test environment\n",
+      "returncode": 1,
+      "error": "CHECK_FAILED T-002: Error; inspect the isolated test environment\n"
+    },
+    {
+      "step_id": "AT-003",
+      "status": "FAILED",
+      "stdout": "",
+      "stderr": "CHECK_FAILED T-003: Error; inspect the isolated test environment\n",
+      "returncode": 1,
+      "error": "CHECK_FAILED T-003: Error; inspect the isolated test environment\n"
+    },
+    {
+      "step_id": "AT-004",
+      "status": "FAILED",
+      "stdout": "",
+      "stderr": "CHECK_FAILED T-004: Error; inspect the isolated test environment\n",
+      "returncode": 1,
+      "error": "CHECK_FAILED T-004: Error; inspect the isolated test environment\n"
+    },
+    {
+      "step_id": "AT-005",
+      "status": "FAILED",
+      "stdout": "",
+      "stderr": "CHECK_FAILED T-005: Error; inspect the isolated test environment\n",
+      "returncode": 1,
+      "error": "CHECK_FAILED T-005: Error; inspect the isolated test environment\n"
+    }
+  ]
+}

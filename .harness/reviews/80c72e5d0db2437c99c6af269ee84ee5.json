@@ -1,0 +1,155 @@
+{
+  "review": {
+    "ticket_id": "T-005",
+    "verdict": "PASS",
+    "review_round": 1,
+    "source_hash": "b1d4f5a47878e8bdb52f377b2c7d47445d231689ce40218dd8d44cb7ac0293a2",
+    "verification_id": "4ebe67b65ab041f1820009723d8055a1",
+    "criteria": [
+      {
+        "id": "AT-001",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt 4ebe67b65ab041f1820009723d8055a1 reports AT-001 PASSED with returncode 0 against the isolated T-005 runtime.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/46659083bdf94d7cabe95dd713481aff.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-002",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt 4ebe67b65ab041f1820009723d8055a1 reports AT-002 PASSED with returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/46659083bdf94d7cabe95dd713481aff.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-003",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt 4ebe67b65ab041f1820009723d8055a1 reports AT-003 PASSED with returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/46659083bdf94d7cabe95dd713481aff.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-004",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt 4ebe67b65ab041f1820009723d8055a1 reports AT-004 PASSED with returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/46659083bdf94d7cabe95dd713481aff.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-005",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt 4ebe67b65ab041f1820009723d8055a1 reports AT-005 PASSED with returncode 0; the isolated runtime disabled the HTTP service, reloaded, and the disabled call was explicitly rejected while the other service stayed callable.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/46659083bdf94d7cabe95dd713481aff.json",
+        "limitations": "The receipt states manual criteria are still required; the manual criteria below supply the missing review evidence."
+      },
+      {
+        "id": "AC-DISABLE-APPLY",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "The management page disabled the HTTP service and '儲存並套用' produced '設定已套用'; effective mcp.json then contained that service with disabled:true.",
+        "source": "D:/AI-Lab/MCP-HUB-acceptance/followup-20261011-t005-formal-09/gateway-config/mcp.json; D:/AI-Lab/MCP-HUB-acceptance/followup-20261011-t005-formal-09/verification/02-mcp.json, 02-hub-draft.json, 03-mcp.json, 03-hub-draft.json",
+        "limitations": "Verified through the isolated loopback fixture and the Hub apply/reload path; no production service was used."
+      },
+      {
+        "id": "AC-PERSIST-AFTER-RELOAD",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "After page.reload the disabled row was still listed and displayed '已停用' with no pending-change banner; both hub-draft.json and mcp.json were byte-identical to the applied disabled state.",
+        "source": "D:/AI-Lab/MCP-HUB-acceptance/followup-20261011-t005-formal-09/verification/03-disabled-applied.png, 04-after-reload.png; verification-log.txt",
+        "limitations": "Confirms the isolated test configuration path persists; persistence of Hub-generated Docker serverDefaults remains out of scope."
+      },
+      {
+        "id": "AC-TARGET-DENIED",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "Calling a tool of the disabled server returned isError:true with 'Server is disabled: <service>. Re-enable it in config to use its tools.' — a structured explicit denial, not a Gateway-wide failure.",
+        "source": "C:/Users/m8508/mcphub/app/node_modules/@1mcp/agent/build/sdk/legacy/server/protocol/toolRequestHandlers.js (patched server-level disabled branch); D:/AI-Lab/MCP-HUB-acceptance/sandbox-disabledtools-20261009/logs/t005-patch-verify.json",
+        "limitations": "Denial message wording is provided by the patched @1mcp handler; unknown tools without a matching prefix still return the original JSON-RPC error and remain distinguishable."
+      },
+      {
+        "id": "AC-OTHER-SERVICE-OK",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "After the disable/apply/reload sequence the unchanged stdio service remained callable and returned the expected convert_time result, in the same isolated run.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/46659083bdf94d7cabe95dd713481aff.json (AT-005); D:/AI-Lab/MCP-HUB-acceptance/followup-20261011-t005-formal-09/logs/gateway.log",
+        "limitations": "The unaffected service is the isolated stdio fixture required by the acceptance contract."
+      },
+      {
+        "id": "AC-DRAFT-VS-APPLIED",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "Before apply the pending state showed '有尚未套用的變更' with hub-draft.json disabled:true and mcp.json disabled:false; after apply both files matched with disabled:true, demonstrating unapplied vs applied are distinct.",
+        "source": "D:/AI-Lab/MCP-HUB-acceptance/followup-20261011-t005-formal-09/verification/02-disabled-pending.png, 02-mcp.json, 02-hub-draft.json, 03-mcp.json",
+        "limitations": "Captured with a temporary loopback service in the same isolated Hub; the temporary service was removed and Gateway stopped afterwards."
+      }
+    ],
+    "findings": []
+  },
+  "handoff": {
+    "ticket_id": "T-005",
+    "review_round": 1,
+    "source_hash": "b1d4f5a47878e8bdb52f377b2c7d47445d231689ce40218dd8d44cb7ac0293a2",
+    "verification_id": "4ebe67b65ab041f1820009723d8055a1",
+    "changes": [
+      {
+        "file": "app/src/gateway-controller.js",
+        "summary": "Detects the @1mcp supervisor auto-respawn identity race in --status/--stop output (identityRace flag), waits for the supervisor to settle, and retries stop/start once so a transient race no longer blocks the disable/apply flow."
+      },
+      {
+        "file": "app/test/gateway-controller.test.js",
+        "summary": "Adds six regression tests covering identity-race detection, settle-to-stopped, settle-then-retry, double-race error, and race-after-start recovery."
+      },
+      {
+        "file": "node_modules/@1mcp/agent/build/sdk/legacy/server/protocol/toolRequestHandlers.js",
+        "summary": "Patched CallTool Unknown-tool branch: when a tool name's server prefix maps to a server-level disabled:true entry, return an explicit isError result whose message contains 'Server is disabled: ...' instead of a bare 'Unknown tool'. Unknown tools with no matching prefix keep the original JSON-RPC error."
+      },
+      {
+        "file": "patches/@1mcp+agent+0.38.2.patch",
+        "summary": "Records the toolRequestHandlers change plus the pre-existing windowsHide hunks; validated with git apply --check against pristine @1mcp/agent 0.38.2."
+      }
+    ],
+    "verification": [
+      {
+        "step": "python -B harness/runner/runner.py verify-ticket --ticket T-005 --trust-commands --timeout 400",
+        "expected": "AT-001 through AT-005 all PASSED with returncode 0 and a source-hash-bound receipt.",
+        "actual": "all_passed=true; AT-001..AT-005 PASSED; verification_id 4ebe67b65ab041f1820009723d8055a1; source_hash b1d4f5a47878e8bdb52f377b2c7d47445d231689ce40218dd8d44cb7ac0293a2.",
+        "status": "PASS"
+      },
+      {
+        "step": "C:\\Users\\m8508\\mcphub\\app: npm test",
+        "expected": "All product unit tests pass, including the new identity-race tests.",
+        "actual": "76/76 passed.",
+        "status": "PASS"
+      },
+      {
+        "step": "Sandbox probes (sandbox-disabledtools-20261009) against real @1mcp/agent 0.38.2",
+        "expected": "disabled server call returns isError:true with 'disabled' text; unknown tools without a matching prefix return a JSON-RPC error without 'disabled'.",
+        "actual": "Both assertions passed; outputs stored at D:/AI-Lab/MCP-HUB-acceptance/sandbox-disabledtools-20261009/logs/t005-patch-verify.json.",
+        "status": "PASS"
+      },
+      {
+        "step": "git apply --check patches/@1mcp+agent+0.38.2.patch on pristine @1mcp/agent 0.38.2",
+        "expected": "Patch applies cleanly.",
+        "actual": "exit 0; all three files check OK.",
+        "status": "PASS"
+      },
+      {
+        "step": "Isolated Playwright/API probe for draft-vs-applied and reload persistence",
+        "expected": "Pending disable differs from applied disable; disabled state persists after reload.",
+        "actual": "VT probe captured pending banner and matching config files, then post-apply and post-reload state; screenshots stored under followup-20261011-t005-formal-09/verification.",
+        "status": "PASS"
+      }
+    ],
+    "dependencies": [
+      "@1mcp/agent 0.38.2 (with the T-005 toolRequestHandlers patch)",
+      "fastify 5.12.5 and @fastify/static 10.1.5",
+      "Node.js 24.19.0 on Windows",
+      "tests/acceptance/check.py and the isolated T-005 fixture D:/AI-Lab/MCP-HUB-acceptance/followup-20261011-t005-formal-09/fixture.json",
+      "T-003 COMPLETE ConfigStore and management-page service lifecycle"
+    ]
+  }
+}

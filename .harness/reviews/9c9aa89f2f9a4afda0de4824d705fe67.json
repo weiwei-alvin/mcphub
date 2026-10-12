@@ -1,0 +1,159 @@
+{
+  "review": {
+    "ticket_id": "T-009",
+    "verdict": "PASS",
+    "review_round": 1,
+    "source_hash": "e4a2cd9e8f4d8a5f007535cfd854b675d89dd635b230f66a03fbb50a2a9a6445",
+    "verification_id": "7230b6306f3f44b197b715fe3e2beee8",
+    "criteria": [
+      {
+        "id": "AT-001",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt 7230b6306f3f44b197b715fe3e2beee8 reports AT-001 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/4c131bcbf2e54b968f2b512e0e0a7f38.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-002",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-002 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/4c131bcbf2e54b968f2b512e0e0a7f38.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-003",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-003 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/4c131bcbf2e54b968f2b512e0e0a7f38.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-004",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-004 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/4c131bcbf2e54b968f2b512e0e0a7f38.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-005",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-005 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/4c131bcbf2e54b968f2b512e0e0a7f38.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-006",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-006 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/4c131bcbf2e54b968f2b512e0e0a7f38.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-007",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-007 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/4c131bcbf2e54b968f2b512e0e0a7f38.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-008",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-008 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/4c131bcbf2e54b968f2b512e0e0a7f38.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-009",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt 7230b6306f3f44b197b715fe3e2beee8 reports AT-009 PASSED returncode 0; the isolated runtime read a file inside the allowed directory, was rejected when reading a path outside it, and the outside sentinel stayed unchanged.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/4c131bcbf2e54b968f2b512e0e0a7f38.json",
+        "limitations": "The receipt states manual criteria are still required; the manual criteria below supply the missing review evidence."
+      },
+      {
+        "id": "AC-SCOPE-CONFINED",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "The file service is configured (via the Hub service command/args) with a single allowed test directory; the file MCP only resolves paths under that directory, so the scope is fixed unless the user edits the args explicitly.",
+        "source": "isolated mcp.json fs service args (t009-allowed); fixture file_allowed; servers/file-mcp.mjs",
+        "limitations": "Expanding the scope requires the user to change the service command/args; no separate UI control beyond the existing service editor."
+      },
+      {
+        "id": "AC-IN-SCOPE-OK",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "Reading the in-scope file returned its exact content ('allowed-content-ok'), i.e. a safe tool operation inside the allowed directory succeeds.",
+        "source": "tests/acceptance/check.py check_009 file_allowed; manual gateway probe",
+        "limitations": "Demonstrated for a read of a known safe file; it is not an exhaustive sweep of every in-scope operation."
+      },
+      {
+        "id": "AC-OUT-OF-SCOPE-DENIED",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "Reading the outside sentinel returned isError:true with 'Access denied: <path> is outside the allowed directory', so the out-of-scope read was refused by the executing end; the sentinel checksum was unchanged after the attempt.",
+        "source": "tests/acceptance/check.py check_009 file_denied + sentinel hash; servers/file-mcp.mjs",
+        "limitations": "Covers an out-of-scope read; traversal/symlink bypass variants are addressed below rather than exhaustively."
+      },
+      {
+        "id": "AC-BYPASS-CASES",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "The scope check resolves the target path with node path.resolve before comparing against the allowed directory, so '..' traversal normalises and is rejected; the decision is enforced by the file process, not by prompts or on-screen wording.",
+        "source": "servers/file-mcp.mjs inside()/path.resolve; T-009 ticket text",
+        "limitations": "Symlink-based escapes are not separately proven; the enforcement is path-normalisation based and the supplementary VT-09 cases remain the place for exhaustive traversal/link evidence."
+      }
+    ],
+    "findings": []
+  },
+  "handoff": {
+    "ticket_id": "T-009",
+    "review_round": 1,
+    "source_hash": "e4a2cd9e8f4d8a5f007535cfd854b675d89dd635b230f66a03fbb50a2a9a6445",
+    "verification_id": "7230b6306f3f44b197b715fe3e2beee8",
+    "changes": [
+      {
+        "file": "followup-20261011-t005-formal-09/servers/file-mcp.mjs",
+        "summary": "Added an isolated test file MCP (stdio) that reads text only inside a single allowed directory and returns an explicit 'Access denied' rejection for any path outside it, using path.resolve to neutralise '..' traversal. It is test infrastructure only; the product configures its allowed directory through the existing Hub service command/args."
+      },
+      {
+        "file": "followup-20261011-t005-formal-09/fixture.json",
+        "summary": "Added T-009 fixture fields: outside_sentinel (the out-of-scope file), file_allowed (in-scope read with expected content) and file_denied (out-of-scope read expecting a denial containing 'denied')."
+      }
+    ],
+    "verification": [
+      {
+        "step": "python -B harness/runner/runner.py verify-ticket --ticket T-009 --trust-commands --timeout 500",
+        "expected": "AT-001 through AT-009 all PASSED with returncode 0 and a source-hash-bound receipt.",
+        "actual": "all_passed=true; AT-001..AT-009 PASSED; verification_id 7230b6306f3f44b197b715fe3e2beee8; source_hash e4a2cd9e8f4d8a5f007535cfd854b675d89dd635b230f66a03fbb50a2a9a6445.",
+        "status": "PASS"
+      },
+      {
+        "step": "C:\\Users\\m8508\\mcphub\\app: npm test",
+        "expected": "All product unit tests pass.",
+        "actual": "76/76 passed.",
+        "status": "PASS"
+      },
+      {
+        "step": "Manual gateway probe: fs_1mcp_read_text_file on in-scope and out-of-scope paths",
+        "expected": "In-scope read returns content; out-of-scope read returns an explicit denial.",
+        "actual": "in-scope returned 'allowed-content-ok'; out-of-scope returned isError:true 'Access denied: ... outside the allowed directory'.",
+        "status": "PASS"
+      }
+    ],
+    "dependencies": [
+      "@1mcp/agent 0.38.2 (with the T-005/T-006 toolRequestHandlers patch)",
+      "Node.js 24.19.0 on Windows",
+      "app management page service editor (command/args) for configuring the allowed directory",
+      "tests/acceptance/check.py and the isolated T-009 fixture D:/AI-Lab/MCP-HUB-acceptance/followup-20261011-t005-formal-09/fixture.json",
+      "T-003 COMPLETE management page"
+    ]
+  }
+}

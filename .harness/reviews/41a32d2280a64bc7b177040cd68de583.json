@@ -1,0 +1,139 @@
+{
+  "review": {
+    "ticket_id": "T-007",
+    "verdict": "PASS",
+    "review_round": 1,
+    "source_hash": "e4a2cd9e8f4d8a5f007535cfd854b675d89dd635b230f66a03fbb50a2a9a6445",
+    "verification_id": "5d33c6c03f6d42acbc9588fc766a7d25",
+    "criteria": [
+      {
+        "id": "AT-001",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt 5d33c6c03f6d42acbc9588fc766a7d25 reports AT-001 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/397d006db7804feebf537b3622e350fe.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-002",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-002 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/397d006db7804feebf537b3622e350fe.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-003",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-003 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/397d006db7804feebf537b3622e350fe.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-004",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-004 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/397d006db7804feebf537b3622e350fe.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-005",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-005 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/397d006db7804feebf537b3622e350fe.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-006",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-006 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/397d006db7804feebf537b3622e350fe.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-007",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt 5d33c6c03f6d42acbc9588fc766a7d25 reports AT-007 PASSED returncode 0; the isolated runtime added two real services, ran 測試連線 to '可連線' with a parseable time, then disabled one and confirmed '已停用'.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/397d006db7804feebf537b3622e350fe.json",
+        "limitations": "The receipt states manual criteria are still required; the manual criteria below supply the missing review evidence."
+      },
+      {
+        "id": "AC-HEALTH-STATES",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "The management page renders distinct health texts 未檢查 / 可連線 / 連線失敗 / 已停用 (HEALTH_TEXT in app/public/app.js) and, after 測試連線, a time element with a parseable ISO datetime (checked by check_007 health()).",
+        "source": "app/public/app.js HEALTH_TEXT and healthCell rendering; tests/acceptance/check.py health()",
+        "limitations": "check_007 asserts 可連線 plus timestamp and 已停用 after disable; the 未檢查 and 連線失敗 branches are covered by health-store unit tests rather than the browser flow."
+      },
+      {
+        "id": "AC-HEALTH-GATING",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "health-store marks 可連線 only after mcp-probe completes initialize (handshake) and tools/list successfully; probeService returns reachable only after both succeed, and failure/timeout leave failed or unchecked.",
+        "source": "app/src/mcp-probe.js; app/src/health-store.js; app/test/health-store.test.js; app/test/mcp-probe.test.js",
+        "limitations": "The automated browser subset shows the happy path; handshake-failure, list-failure and timeout are covered by unit tests with a transport double, not the live Gateway."
+      },
+      {
+        "id": "AC-DISABLED-OVERRIDES",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "After disabling, the row's health shows 已停用 overriding any earlier 可連線 result, and the other service's health is unaffected; health-store reports disabled over an older successful result and keys results per service.",
+        "source": "app/src/health-store.js; app/test/health-store.test.js (disabled overrides older success); tests/acceptance/check.py check_007",
+        "limitations": "Verified for the two-service isolated fixture; simultaneous partial failures across many services are covered by unit-level reasoning."
+      },
+      {
+        "id": "AC-CHECK-SCOPE",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "The health check result reflects handshake plus tool listing only; the UI label 可連線 and the ticket wording make clear it is a connectivity check, not proof that every tool executed successfully.",
+        "source": "app/src/mcp-probe.js (initialize + tools/list, no tool execution); T-007 ticket text",
+        "limitations": "This is a documentation/UI-semantics criterion; no separate automated assertion beyond the probe's scope."
+      }
+    ],
+    "findings": []
+  },
+  "handoff": {
+    "ticket_id": "T-007",
+    "review_round": 1,
+    "source_hash": "e4a2cd9e8f4d8a5f007535cfd854b675d89dd635b230f66a03fbb50a2a9a6445",
+    "verification_id": "5d33c6c03f6d42acbc9588fc766a7d25",
+    "changes": [
+      {
+        "file": "app/public/app.js",
+        "summary": "Changed the row enable-state label from 已停用/已啟用 to 停用中/啟用中 so it no longer duplicates the health status text 已停用, which the acceptance requires to be a single, unambiguous health indicator in the row."
+      }
+    ],
+    "verification": [
+      {
+        "step": "python -B harness/runner/runner.py verify-ticket --ticket T-007 --trust-commands --timeout 500",
+        "expected": "AT-001 through AT-007 all PASSED with returncode 0 and a source-hash-bound receipt.",
+        "actual": "all_passed=true; AT-001..AT-007 PASSED; verification_id 5d33c6c03f6d42acbc9588fc766a7d25; source_hash e4a2cd9e8f4d8a5f007535cfd854b675d89dd635b230f66a03fbb50a2a9a6445.",
+        "status": "PASS"
+      },
+      {
+        "step": "C:\\Users\\m8508\\mcphub\\app: npm test",
+        "expected": "All product unit tests pass.",
+        "actual": "76/76 passed.",
+        "status": "PASS"
+      },
+      {
+        "step": "python -B tests/acceptance/check.py --ticket T-007 on the isolated runtime",
+        "expected": "Health shows 可連線 with a parseable timestamp, then 已停用 after disable, with a unique 已停用 in the row.",
+        "actual": "AUTOMATED_CHECK_PASS T-007 (the duplicate-label strict-mode violation is resolved by the 停用中/啟用中 change).",
+        "status": "PASS"
+      }
+    ],
+    "dependencies": [
+      "@1mcp/agent 0.38.2 (with the T-005/T-006 toolRequestHandlers patch)",
+      "fastify 5.12.5 and @fastify/static 10.1.5",
+      "Node.js 24.19.0 on Windows",
+      "tests/acceptance/check.py and the isolated T-007 fixture D:/AI-Lab/MCP-HUB-acceptance/followup-20261011-t005-formal-09/fixture.json",
+      "app/src/mcp-probe.js, app/src/health-store.js, T-005 COMPLETE disable semantics"
+    ]
+  }
+}

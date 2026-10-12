@@ -1,10 +1,14 @@
 {
   "schema_version": "1.1",
-  "project_status": "IN_PROGRESS",
+  "project_status": "PAUSED",
   "pipeline_stage": "IMPLEMENTATION",
   "stage_status": "IN_PROGRESS",
-  "active_ticket_id": "T-004",
-  "pause": null,
+  "active_ticket_id": "T-010",
+  "pause": {
+    "reason": "REVIEW_USER_DECISION_REQUIRED",
+    "decision_ref": "DEC-001",
+    "pause_id": "fbab28345cd345a8a18736315992f0ff"
+  },
   "tickets": {
     "T-001": {
       "status": "COMPLETE",
@@ -55,41 +59,103 @@
       ]
     },
     "T-004": {
-      "status": "IN_PROGRESS",
+      "status": "COMPLETE",
       "review_attempts": 0,
       "active_findings": [],
       "verification": {
-        "path": "verifications/1a32f421cde84c8db44e0a9876084a11.json",
-        "sha256": "f3d8baaf08df9982d54500b704e8a2a08ca512345d1cbd4f4e78d9d4c6a4e974"
-      }
+        "path": "verifications/5a8fb6dad3bc462491e55b1d7f4c1141.json",
+        "sha256": "8be4c28c8f881721a04cfcfca8fa9471251385e88b2672a951a4fbd48abeb4eb"
+      },
+      "review_total": 1,
+      "review_history": [
+        {
+          "path": "reviews/b62eebf885524b5ab95c55d32d42dabf.json",
+          "sha256": "9ebf612c1ef5de078ebd56ff6945d84fd87e78f9e43a9659691306502bb58d31"
+        }
+      ]
     },
     "T-005": {
-      "status": "TODO",
+      "status": "COMPLETE",
       "review_attempts": 0,
-      "active_findings": []
+      "active_findings": [],
+      "verification": {
+        "path": "verifications/46659083bdf94d7cabe95dd713481aff.json",
+        "sha256": "96d6759cfec72a9f3cab83dac8cb5d766b1f60d0c0f61ce760db5645cfe3159f"
+      },
+      "review_total": 1,
+      "review_history": [
+        {
+          "path": "reviews/80c72e5d0db2437c99c6af269ee84ee5.json",
+          "sha256": "78b245c808f346cf1a482ee9e0a460b539bba00f46afe8c6b92a5e511f184091"
+        }
+      ]
     },
     "T-006": {
-      "status": "TODO",
+      "status": "COMPLETE",
       "review_attempts": 0,
-      "active_findings": []
+      "active_findings": [],
+      "verification": {
+        "path": "verifications/8ec7f44f631a43008d8ac46702db1197.json",
+        "sha256": "3374cacdded0f24ae4d29fd482b4d3cb72713e449aedc5e32ca3e7d19e006ac5"
+      },
+      "review_total": 1,
+      "review_history": [
+        {
+          "path": "reviews/30853ef4ee244f66a8f45882c3e5d81e.json",
+          "sha256": "eb47e2face7fbcd90b860238816b944deedb0c08b533d3a43753011c9d81d7db"
+        }
+      ]
     },
     "T-007": {
-      "status": "TODO",
+      "status": "COMPLETE",
       "review_attempts": 0,
-      "active_findings": []
+      "active_findings": [],
+      "verification": {
+        "path": "verifications/397d006db7804feebf537b3622e350fe.json",
+        "sha256": "a39db7d6bfc6c76d8523a7d552ac8bad3e66ef9505243681675415a1f99bd5a0"
+      },
+      "review_total": 1,
+      "review_history": [
+        {
+          "path": "reviews/41a32d2280a64bc7b177040cd68de583.json",
+          "sha256": "c25c0b47610d8f917b0c29059224936e455e6f42352a0be03433990f5937855c"
+        }
+      ]
     },
     "T-008": {
-      "status": "TODO",
+      "status": "COMPLETE",
       "review_attempts": 0,
-      "active_findings": []
+      "active_findings": [],
+      "verification": {
+        "path": "verifications/6fc576d23cae496db6305382f994d034.json",
+        "sha256": "19c3307ebde04e63b3f02ef05a7396f7b640474d3171f5aa6a42d4ca28bcc5a0"
+      },
+      "review_total": 1,
+      "review_history": [
+        {
+          "path": "reviews/43cdeb4838f445508842c730aac3bfc1.json",
+          "sha256": "d5f847e80793b4b9f1e4eec3efb09a43b9e900749cca1fd6f8711c87f3953551"
+        }
+      ]
     },
     "T-009": {
-      "status": "TODO",
+      "status": "COMPLETE",
       "review_attempts": 0,
-      "active_findings": []
+      "active_findings": [],
+      "verification": {
+        "path": "verifications/4c131bcbf2e54b968f2b512e0e0a7f38.json",
+        "sha256": "ba276dc0fa29018b5efdefb8547b63d39e84709ce99a15d7434e7c730d518311"
+      },
+      "review_total": 1,
+      "review_history": [
+        {
+          "path": "reviews/9c9aa89f2f9a4afda0de4824d705fe67.json",
+          "sha256": "2471e0c35d3e6bc27cbfc31827d132ebe5e442e20d5d15247e5cebd6cf2e12b0"
+        }
+      ]
     },
     "T-010": {
-      "status": "TODO",
+      "status": "IN_PROGRESS",
       "review_attempts": 0,
       "active_findings": []
     },

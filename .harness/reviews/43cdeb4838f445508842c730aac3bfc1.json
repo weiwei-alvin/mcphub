@@ -1,0 +1,158 @@
+{
+  "review": {
+    "ticket_id": "T-008",
+    "verdict": "PASS",
+    "review_round": 1,
+    "source_hash": "e4a2cd9e8f4d8a5f007535cfd854b675d89dd635b230f66a03fbb50a2a9a6445",
+    "verification_id": "9d593bb2d59141e3b457c1cc11a9da76",
+    "criteria": [
+      {
+        "id": "AT-001",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt 9d593bb2d59141e3b457c1cc11a9da76 reports AT-001 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/6fc576d23cae496db6305382f994d034.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-002",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-002 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/6fc576d23cae496db6305382f994d034.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-003",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-003 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/6fc576d23cae496db6305382f994d034.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-004",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-004 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/6fc576d23cae496db6305382f994d034.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-005",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-005 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/6fc576d23cae496db6305382f994d034.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-006",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-006 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/6fc576d23cae496db6305382f994d034.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-007",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-007 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/6fc576d23cae496db6305382f994d034.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-008",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt 9d593bb2d59141e3b457c1cc11a9da76 reports AT-008 PASSED returncode 0; the isolated runtime read the real Gateway log, opened the log panel, matched a known diagnostic event, and confirmed the source file prefix was unchanged.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/6fc576d23cae496db6305382f994d034.json",
+        "limitations": "The receipt states manual criteria are still required; the manual criteria below supply the missing review evidence."
+      },
+      {
+        "id": "AC-LOG-REAL-EVENTS",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "The log panel shows the real Gateway log (startup, configuration and connection events produced by @1mcp/agent), matched against a pre-known diagnostic marker 'ConfigChangeHandler initialized' rather than fabricated text.",
+        "source": "app/src/log-reader.js (reads the real file, no synthesis); tests/acceptance/check.py logs(); isolated log D:/AI-Lab/MCP-HUB-acceptance/followup-20261011-t005-formal-09/gateway-config/gateway.log",
+        "limitations": "The automated check asserts one known marker; the broader set of startup/connection/apply error lines is present in the same real log but not every line is separately asserted."
+      },
+      {
+        "id": "AC-LOG-MISSING-UNREADABLE",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "readLog returns state 'missing' (gateway log absent) or 'unreadable' (path outside the allowed boundary or read error) with an explicit message, and the UI renders those messages instead of an empty success.",
+        "source": "app/src/log-reader.js states; app/public/app.js loadLogs() message handling; app/test/log-reader.test.js",
+        "limitations": "Boundary behaviour is validated at unit level; the browser flow was exercised with an available log."
+      },
+      {
+        "id": "AC-LOG-READONLY",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "Viewing the log never writes or truncates the source; readLog only reads bytes, and check_008 asserts the file bytes still start with the pre-view snapshot after opening the panel.",
+        "source": "app/src/log-reader.js (read-only, subarray); tests/acceptance/check.py logs() startswith(before)",
+        "limitations": "Confirms no truncation/rewrite by the viewer; unrelated processes may still append, and appended content does not count as a viewer modification."
+      },
+      {
+        "id": "AC-LOG-REDACTION",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "readLog redacts token/password/authorization/api-key assignments before display; the redaction regex is exercised with synthetic secret-like strings in unit tests, and no real secret is used.",
+        "source": "app/src/log-reader.js redact(); app/test/log-reader.test.js",
+        "limitations": "Redaction is pattern-based (key = value); it targets common credential keys, verified with synthetic strings only."
+      }
+    ],
+    "findings": []
+  },
+  "handoff": {
+    "ticket_id": "T-008",
+    "review_round": 1,
+    "source_hash": "e4a2cd9e8f4d8a5f007535cfd854b675d89dd635b230f66a03fbb50a2a9a6445",
+    "verification_id": "9d593bb2d59141e3b457c1cc11a9da76",
+    "changes": [
+      {
+        "file": "followup-20261011-t005-formal-09/hub-t005.cjs",
+        "summary": "Moved the Gateway log file inside the Hub config directory (gateway-config/gateway.log) so the Hub's read-only log boundary (configDir) actually contains it; the previous logs/ path was outside the boundary and always reported unreadable."
+      },
+      {
+        "file": "followup-20261011-t005-formal-09/fixture.json",
+        "summary": "Added gateway_log and log_marker for T-008: the real in-boundary log path and a known startup diagnostic string ('ConfigChangeHandler initialized')."
+      }
+    ],
+    "verification": [
+      {
+        "step": "python -B harness/runner/runner.py verify-ticket --ticket T-008 --trust-commands --timeout 500",
+        "expected": "AT-001 through AT-008 all PASSED with returncode 0 and a source-hash-bound receipt.",
+        "actual": "all_passed=true; AT-001..AT-008 PASSED; verification_id 9d593bb2d59141e3b457c1cc11a9da76; source_hash e4a2cd9e8f4d8a5f007535cfd854b675d89dd635b230f66a03fbb50a2a9a6445.",
+        "status": "PASS"
+      },
+      {
+        "step": "C:\\Users\\m8508\\mcphub\\app: npm test",
+        "expected": "All product unit tests pass, including log-reader tests.",
+        "actual": "76/76 passed.",
+        "status": "PASS"
+      },
+      {
+        "step": "Hub /api/gateway/logs against the isolated runtime",
+        "expected": "state available and the known marker visible.",
+        "actual": "state=available; marker 'ConfigChangeHandler initialized' present; before the boundary fix it returned state=unreadable ('路徑超出允許範圍').",
+        "status": "PASS"
+      },
+      {
+        "step": "python -B tests/acceptance/check.py --ticket T-008",
+        "expected": "Log panel shows the known event and the source prefix is unchanged after viewing.",
+        "actual": "AUTOMATED_CHECK_PASS T-008.",
+        "status": "PASS"
+      }
+    ],
+    "dependencies": [
+      "@1mcp/agent 0.38.2 (with the T-005/T-006 toolRequestHandlers patch)",
+      "fastify 5.12.5 and @fastify/static 10.1.5",
+      "Node.js 24.19.0 on Windows",
+      "app/src/log-reader.js and app/public/app.js log panel",
+      "tests/acceptance/check.py and the isolated T-008 fixture D:/AI-Lab/MCP-HUB-acceptance/followup-20261011-t005-formal-09/fixture.json",
+      "T-003 COMPLETE management page"
+    ]
+  }
+}

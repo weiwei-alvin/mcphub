@@ -3,8 +3,8 @@ document_title: MCP Hub Acceptance Check Contract
 chinese_title: MCP Hub 驗證入口與測試契約
 aka: []
 established_date: 2026-10-02
-updated_date: 2026-10-02
-version: 1.0.0
+updated_date: 2026-10-09
+version: 1.1.0
 ---
 
 # 驗證入口與測試契約
@@ -25,9 +25,10 @@ check.py 是實際向 Gateway 發出請求並操作管理 UI 的驗證程式，�
 
 1. 在工作區外的專用測試目錄建立隔離環境；不要使用正式 Gateway、既有使用者設定或正式資料。目錄內建立 `.mcp-hub-acceptance`，其內容為 `isolated-test-environment`。標記是防誤操作的約定，不是 OS sandbox。
 2. 以 `MCP_HUB_ACCEPTANCE_CONFIG` 指定無機密 JSON fixture 的絕對路徑，並明確設定 `MCP_HUB_ACCEPTANCE_ALLOW_MUTATION=1`。未設定時程式在任何網路操作前失敗。
-3. 準備兩個安全、可重現、無憑證的測試服務。T-001、T-002 使用預先配置的服務；新增設定類測試會建立隨機名稱的新服務，不刪除既有設定。測試完保留測試資源供核對，不自行批次清理。
+3. 準備兩個安全、可重現、無憑證的測試服務。T-001、T-002 使用預先配置的服務；新增設定類測試會建立隨機名稱的新服務，不刪除既有設定。測試完保留測試設定、日誌與資料供核對，不自行批次刪除；執行中的程序不在保留範圍，依第 6 點停止。
 4. UI 驗證需要 Python Playwright 與其可用 Chromium。它用於瀏覽器操作，與產品前後端技術選擇無關。選定相容版本並依授權完成安裝後才能驗證；本輪未安裝。
 5. 不要讓測試產物或應用設定落入受 source hash 管理的專案目錄。自動程式使用 `-B` 禁止 bytecode，沒有新增排除規則；若日後必須新增產物位置，明確審閱後再調整 golden_path.json，不排除原始碼或整個 .harness。
+6. 每次驗收結束時，不論結果是通過或失敗，都要停止本次啟動的所有程序：對本次的 Gateway config-dir 執行 `node <@1mcp/agent build/index.js> --config-dir <本次 config-dir> --stop`，並結束本次啟動的測試 Hub 與測試服務程序。停止指令的輸出存入本次 sandbox_root 作為證據。背景 Gateway 若未停止，會持續占用連接埠，而且 supervisor 會在 worker 結束後自動把它重新啟動。
 
 ## Fixture 欄位
 

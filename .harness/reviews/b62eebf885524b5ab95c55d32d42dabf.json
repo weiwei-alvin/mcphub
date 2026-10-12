@@ -1,0 +1,145 @@
+{
+  "review": {
+    "ticket_id": "T-004",
+    "review_round": 1,
+    "source_hash": "2312e986eeac047359dfc5c27cf7b8f26676632152c213ec76e499200f12ad3f",
+    "verification_id": "c93c1498b36f4555a8811f35d50dabc4",
+    "verdict": "PASS",
+    "criteria": [
+      {
+        "id": "AT-001",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "Formal receipt 5a8fb6dad3bc462491e55b1d7f4c1141 reports AT-001 PASSED with returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/5a8fb6dad3bc462491e55b1d7f4c1141.json",
+        "limitations": "This is the automated T-001 prerequisite step; it is not treated as a whole-ticket verdict."
+      },
+      {
+        "id": "AT-002",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "Formal receipt 5a8fb6dad3bc462491e55b1d7f4c1141 reports AT-002 PASSED with returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/5a8fb6dad3bc462491e55b1d7f4c1141.json",
+        "limitations": "This is the automated T-002 prerequisite step; it is not treated as a whole-ticket verdict."
+      },
+      {
+        "id": "AT-003",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "Formal receipt 5a8fb6dad3bc462491e55b1d7f4c1141 reports AT-003 PASSED with returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/5a8fb6dad3bc462491e55b1d7f4c1141.json",
+        "limitations": "This is the automated T-003 prerequisite step; it is not treated as a whole-ticket verdict."
+      },
+      {
+        "id": "AT-004",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "Formal receipt 5a8fb6dad3bc462491e55b1d7f4c1141 reports AT-004 PASSED with returncode 0; the clean formal runtime edited the HTTP service, restarted and reloaded Gateway state, and called both downstream services.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/5a8fb6dad3bc462491e55b1d7f4c1141.json; D:/AI-Lab/MCP-HUB-acceptance/followup-20261008-t004-formal-04",
+        "limitations": "The receipt itself states that manual criteria are still required; the manual negative criterion below supplies the missing review evidence."
+      },
+      {
+        "id": "AC-EDIT-REPLACEMENT",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "AT-004 changed the existing HTTP test service to replacement_http and observed a different known result through the real Gateway.",
+        "source": "Formal AT-004 receipt 5a8fb6dad3bc462491e55b1d7f4c1141; isolated runtime D:/AI-Lab/MCP-HUB-acceptance/followup-20261008-t004-formal-04",
+        "limitations": "The replacement endpoint is an isolated loopback fixture; no external production service was used."
+      },
+      {
+        "id": "AC-RELOAD-PERSISTENCE",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "AT-004 reloaded the management page after apply and completed the post-reload Gateway call against the replacement result.",
+        "source": "Formal AT-004 receipt 5a8fb6dad3bc462491e55b1d7f4c1141; tests/acceptance/check.py check_004",
+        "limitations": "This proves the isolated test configuration path only; ConfigStore-generated Docker serverDefaults/env propagation remains UNVERIFIED."
+      },
+      {
+        "id": "AC-OTHER-SERVICE",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "AT-004 called the unchanged stdio service successfully before and after the HTTP edit/reload sequence.",
+        "source": "Formal AT-004 receipt 5a8fb6dad3bc462491e55b1d7f4c1141; isolated runtime D:/AI-Lab/MCP-HUB-acceptance/followup-20261008-t004-formal-04",
+        "limitations": "The unaffected service is the isolated stdio fixture required by the acceptance contract."
+      },
+      {
+        "id": "AC-INVALID-EDIT",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "VT04_INVALID_EDIT_REJECTED_PRESERVED_CONFIG used the real management page to edit manual-http to a URL containing a query parameter. The UI displayed the field error '服務 URL 不得包含查詢參數或片段'; the two service rows remained, the original URL remained, effective mcp.json was byte-identical, and no hub-draft.json was created.",
+        "source": "Isolated Playwright/API probe; runtime D:/AI-Lab/MCP-HUB-acceptance/manual-t004-negative-20261009-100516; app/public/app.js; app/src/server.js; app/src/config-store.js",
+        "limitations": "This probe covers an invalid query-bearing URL through the real browser flow. Credential-bearing URL and malformed scheme cases are separately covered by app/test/config-store.test.js; no Gateway apply was attempted after the rejected edit."
+      }
+    ],
+    "findings": []
+  },
+  "handoff": {
+    "ticket_id": "T-004",
+    "review_round": 1,
+    "source_hash": "2312e986eeac047359dfc5c27cf7b8f26676632152c213ec76e499200f12ad3f",
+    "verification_id": "c93c1498b36f4555a8811f35d50dabc4",
+    "changes": [
+      {
+        "file": "app/public/app.js",
+        "summary": "Keeps the management page's edit/apply flow aligned with the acceptance labels and waits for fresh apply feedback before treating the configuration as applied."
+      },
+      {
+        "file": "app/public/index.html",
+        "summary": "Preserves the real service editor, field-level errors, and accessible controls used by the T-004 browser acceptance."
+      },
+      {
+        "file": "app/src/config-store.js",
+        "summary": "Revalidates a complete edited service before writing the draft, rejects query-bearing URLs, and leaves the existing draft/effective configuration untouched on validation failure."
+      },
+      {
+        "file": "tests/acceptance/check.py",
+        "summary": "Runs T-004 against isolated real UI/Gateway runtimes, including reload, replacement endpoint, unchanged-service calls, bounded SSE parsing, and Windows lifecycle timing."
+      }
+    ],
+    "verification": [
+      {
+        "step": "Formal T-004 receipt 5a8fb6dad3bc462491e55b1d7f4c1141",
+        "expected": "AT-001 through AT-004 pass with returncode 0 and a source-hash-bound receipt.",
+        "actual": "all_passed=true; AT-001, AT-002, AT-003 and AT-004 PASSED; source_hash=2312e986eeac047359dfc5c27cf7b8f26676632152c213ec76e499200f12ad3f; verification_id=c93c1498b36f4555a8811f35d50dabc4.",
+        "status": "PASS"
+      },
+      {
+        "step": "C:\\Users\\m8508\\mcphub\\app: npm test",
+        "expected": "All product unit tests pass.",
+        "actual": "69/69 passed.",
+        "status": "PASS"
+      },
+      {
+        "step": "node --check public\\app.js and node --test test\\public-contract.test.js",
+        "expected": "The browser script parses and the public contract tests pass.",
+        "actual": "Syntax check passed; public contract 5/5 passed.",
+        "status": "PASS"
+      },
+      {
+        "step": "D:\\AI-Lab\\MCP HUB: python -B -m unittest discover -s tests/acceptance -p test_checker.py -v",
+        "expected": "Acceptance checker self-tests pass.",
+        "actual": "13/13 passed.",
+        "status": "PASS"
+      },
+      {
+        "step": "Isolated Playwright/API probe VT04_INVALID_EDIT_REJECTED_PRESERVED_CONFIG",
+        "expected": "A rejected edit displays a field error and preserves both services and the effective configuration.",
+        "actual": "Probe passed; error visible, service count and original URL preserved, effective mcp.json byte-identical, and no hub-draft.json created. Runtime: D:/AI-Lab/MCP-HUB-acceptance/manual-t004-negative-20261009-100516.",
+        "status": "PASS"
+      },
+      {
+        "step": "git diff --check in the authoritative acceptance project",
+        "expected": "No whitespace errors are reported.",
+        "actual": "Passed; line-ending normalization warnings were retained as non-fatal repository output.",
+        "status": "PASS"
+      }
+    ],
+    "dependencies": [
+      "@1mcp/agent 0.38.2",
+      "fastify 5.12.5 and @fastify/static 10.1.5",
+      "Node.js 24.19.0 on Windows",
+      "tests/acceptance/check.py and isolated T-004 fixtures",
+      "T-003 COMPLETE ConfigStore and management-page service lifecycle"
+    ]
+  }
+}
