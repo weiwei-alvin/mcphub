@@ -1,14 +1,10 @@
 {
   "schema_version": "1.1",
-  "project_status": "PAUSED",
-  "pipeline_stage": "IMPLEMENTATION",
+  "project_status": "COMPLETE",
+  "pipeline_stage": "REVIEW",
   "stage_status": "IN_PROGRESS",
-  "active_ticket_id": "T-010",
-  "pause": {
-    "reason": "REVIEW_USER_DECISION_REQUIRED",
-    "decision_ref": "DEC-001",
-    "pause_id": "fbab28345cd345a8a18736315992f0ff"
-  },
+  "active_ticket_id": null,
+  "pause": null,
   "tickets": {
     "T-001": {
       "status": "COMPLETE",
@@ -155,18 +151,44 @@
       ]
     },
     "T-010": {
-      "status": "IN_PROGRESS",
+      "status": "COMPLETE",
       "review_attempts": 0,
-      "active_findings": []
+      "active_findings": [],
+      "verification": {
+        "path": "verifications/c1fca7f0bc7b426fae5bd49cdfab3afc.json",
+        "sha256": "1914d2f828385c9c09bc2a013eaf9cd7daca422ca2cc1aff9f6f45c48fb69c66"
+      },
+      "review_total": 1,
+      "review_history": [
+        {
+          "path": "reviews/76dd5b023ef4493cbaeb6d036accb169.json",
+          "sha256": "28e3ffa5e3d0a103eebda1121b821348ee2f0d84362c8607175fe06bc9fd416d"
+        }
+      ]
     },
     "T-011": {
-      "status": "TODO",
+      "status": "COMPLETE",
       "review_attempts": 0,
-      "active_findings": []
+      "active_findings": [],
+      "verification": {
+        "path": "verifications/fa5eccf8fb8e4649bdcf4aa86cbf8771.json",
+        "sha256": "fe39492ee0e2c46682187a63adc9765b778ab28f751d713d9c3451978f5f3183"
+      },
+      "review_total": 1,
+      "review_history": [
+        {
+          "path": "reviews/7b84ef1c607f46aaaf0020fcf0a889f0.json",
+          "sha256": "9e270484fefdedbccfb45bca17cbe62c01b3f0294df1e7966068f38fc00f2276"
+        }
+      ]
     }
   },
   "findings": {},
   "approved_plan": {
-    "sha256": "86173c5490a4dfd0b0d2828631b60feef125f5fdb7ca6d8647aa92ea6d358aa4"
+    "sha256": "71177926cfee5cd72a96890804ef76178a855df06f688f3b51b7a941af4e34bd"
+  },
+  "final_verification": {
+    "path": "verifications/752a1146325c4965bd32a64a8b29101f.json",
+    "sha256": "e011aa29b1814fd605849a915036da3a5a552afbacb1503f0a8c6b5623d73d13"
   }
 }

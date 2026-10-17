@@ -1,0 +1,98 @@
+{
+  "source_hash": "c26e31ce94dca39d380f6e28c176f499cb8dffe7386d956bcd708af5743f455a",
+  "status": "PASSED",
+  "total_steps": 11,
+  "passed": 11,
+  "failed": 0,
+  "unverified": 0,
+  "details": [
+    {
+      "step_id": "AT-001",
+      "status": "PASSED",
+      "output": "AUTOMATED_CHECK_PASS T-001\nMANUAL_CRITERIA_STILL_REQUIRED: this is not an iPhone or whole-ticket verdict\n",
+      "returncode": 0,
+      "stderr": "",
+      "error": null
+    },
+    {
+      "step_id": "AT-002",
+      "status": "PASSED",
+      "output": "AUTOMATED_CHECK_PASS T-002\nMANUAL_CRITERIA_STILL_REQUIRED: this is not an iPhone or whole-ticket verdict\n",
+      "returncode": 0,
+      "stderr": "",
+      "error": null
+    },
+    {
+      "step_id": "AT-003",
+      "status": "PASSED",
+      "output": "AUTOMATED_CHECK_PASS T-003\nMANUAL_CRITERIA_STILL_REQUIRED: this is not an iPhone or whole-ticket verdict\n",
+      "returncode": 0,
+      "stderr": "",
+      "error": null
+    },
+    {
+      "step_id": "AT-004",
+      "status": "PASSED",
+      "output": "AUTOMATED_CHECK_PASS T-004\nMANUAL_CRITERIA_STILL_REQUIRED: this is not an iPhone or whole-ticket verdict\n",
+      "returncode": 0,
+      "stderr": "",
+      "error": null
+    },
+    {
+      "step_id": "AT-005",
+      "status": "PASSED",
+      "output": "AUTOMATED_CHECK_PASS T-005\nMANUAL_CRITERIA_STILL_REQUIRED: this is not an iPhone or whole-ticket verdict\n",
+      "returncode": 0,
+      "stderr": "",
+      "error": null
+    },
+    {
+      "step_id": "AT-006",
+      "status": "PASSED",
+      "output": "AUTOMATED_CHECK_PASS T-006\nMANUAL_CRITERIA_STILL_REQUIRED: this is not an iPhone or whole-ticket verdict\n",
+      "returncode": 0,
+      "stderr": "",
+      "error": null
+    },
+    {
+      "step_id": "AT-007",
+      "status": "PASSED",
+      "output": "AUTOMATED_CHECK_PASS T-007\nMANUAL_CRITERIA_STILL_REQUIRED: this is not an iPhone or whole-ticket verdict\n",
+      "returncode": 0,
+      "stderr": "",
+      "error": null
+    },
+    {
+      "step_id": "AT-008",
+      "status": "PASSED",
+      "output": "AUTOMATED_CHECK_PASS T-008\nMANUAL_CRITERIA_STILL_REQUIRED: this is not an iPhone or whole-ticket verdict\n",
+      "returncode": 0,
+      "stderr": "",
+      "error": null
+    },
+    {
+      "step_id": "AT-009",
+      "status": "PASSED",
+      "output": "AUTOMATED_CHECK_PASS T-009\nMANUAL_CRITERIA_STILL_REQUIRED: this is not an iPhone or whole-ticket verdict\n",
+      "returncode": 0,
+      "stderr": "",
+      "error": null
+    },
+    {
+      "step_id": "AT-010",
+      "status": "PASSED",
+      "output": "AUTOMATED_CHECK_PASS T-010\nMANUAL_CRITERIA_STILL_REQUIRED: this is not an iPhone or whole-ticket verdict\n",
+      "returncode": 0,
+      "stderr": "",
+      "error": null
+    },
+    {
+      "step_id": "AT-011",
+      "status": "PASSED",
+      "output": "AUTOMATED_CHECK_PASS T-011\nMANUAL_CRITERIA_STILL_REQUIRED: this is not an iPhone or whole-ticket verdict\n",
+      "returncode": 0,
+      "stderr": "",
+      "error": null
+    }
+  ]
+}

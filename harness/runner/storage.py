@@ -47,7 +47,7 @@ def atomic_json(path, data):
         if tmp_path and tmp_path.exists(): tmp_path.unlink()
 
 DEFAULT_EXCLUDED_DIRS=frozenset({'.git','__pycache__','.pytest_cache','.mypy_cache','.ruff_cache','.venv','venv','node_modules'})
-SETTINGS_KEYS=frozenset({'steps','source_hash_exclude','env_passthrough'})
+SETTINGS_KEYS=frozenset({'steps','source_hash_exclude','source_hash_external_roots','env_passthrough'})
 ENV_NAME=re.compile(r'^[A-Za-z_][A-Za-z0-9_()]*$')
 
 def project_settings(root):
@@ -55,10 +55,13 @@ def project_settings(root):
 
     source_hash_exclude: relative POSIX glob patterns for files/directories that
     verification commands generate (coverage data, build output, logs).
+    source_hash_external_roots: explicit absolute source roots outside the harness
+      project. Each root declares relative include patterns so a receipt binds the
+      product source actually exercised by an external acceptance runtime.
     env_passthrough: extra environment variable names passed to verification commands.
     """
     path=Path(root)/'.harness'/'golden_path.json'
-    settings=dict(source_hash_exclude=[],env_passthrough=[])
+    settings=dict(source_hash_exclude=[],source_hash_external_roots=[],env_passthrough=[])
     if not path.exists(): return settings
     try: data=json.loads(path.read_text(encoding='utf-8'))
     except Exception as exc: raise ValueError(f'Invalid golden_path.json: {exc}') from exc
@@ -77,7 +80,28 @@ def project_settings(root):
     names=data.get('env_passthrough',[])
     if not isinstance(names,list) or not all(isinstance(x,str) and ENV_NAME.match(x) for x in names):
         raise ValueError('env_passthrough must be an array of environment variable names')
-    settings.update(source_hash_exclude=[x.replace('\\','/') for x in patterns],env_passthrough=names)
+    external=[]
+    for item in data.get('source_hash_external_roots',[]):
+        if not isinstance(item,dict) or set(item)!={'path','include'}:
+            raise ValueError('source_hash_external_roots entries must contain only path and include')
+        if not isinstance(item['path'],str):
+            raise ValueError('source_hash_external_roots.path must be a string')
+        root=Path(item['path']).expanduser()
+        if not root.is_absolute():
+            raise ValueError('source_hash_external_roots.path must be an absolute path')
+        if root.is_symlink() or not root.is_dir():
+            raise ValueError(f'source_hash_external_roots.path must be a real directory: {item["path"]}')
+        includes=item['include']
+        if not isinstance(includes,list) or not includes or not all(isinstance(x,str) and x.strip() for x in includes):
+            raise ValueError('source_hash_external_roots.include must be a nonempty array of strings')
+        normalized=[]
+        for pattern in includes:
+            parts=pattern.replace('\\','/').split('/')
+            if pattern.startswith(('/','\\')) or ':' in parts[0] or '..' in parts or pattern.strip() in ('','*','**','**/*'):
+                raise ValueError(f'source_hash_external_roots.include must be a bounded relative pattern: {pattern}')
+            normalized.append(pattern.replace('\\','/'))
+        external.append(dict(path=str(root.resolve()),include=normalized))
+    settings.update(source_hash_exclude=[x.replace('\\','/') for x in patterns],source_hash_external_roots=external,env_passthrough=names)
     return settings
 
 def _excluded(rel, patterns):
@@ -91,7 +115,8 @@ def source_hash(root):
     the project; this function reads content but persists only the aggregate digest.
     """
     root=Path(root).resolve(); h=hashlib.sha256()
-    patterns=project_settings(root)['source_hash_exclude']
+    settings=project_settings(root)
+    patterns=settings['source_hash_exclude']
     for base, dirs, names in os.walk(root, followlinks=False):
         reldir=Path(base).relative_to(root).as_posix()
         prefix='' if reldir=='.' else reldir+'/'
@@ -102,6 +127,17 @@ def source_hash(root):
             if rel.parts[0]=='.harness' and not (len(rel.parts)>1 and (rel.parts[1]=='tickets' or str(rel.as_posix())=='.harness/golden_path.json')): continue
             if rel.parts[0]!='.harness' and _excluded(rel.as_posix(),patterns): continue
             h.update(rel.as_posix().encode()); h.update(b'\0'); h.update(p.read_bytes()); h.update(b'\0')
+    for item in sorted(settings['source_hash_external_roots'],key=lambda x: x['path'].casefold()):
+        external_root=Path(item['path'])
+        for base, dirs, names in os.walk(external_root, followlinks=False):
+            dirs[:]=sorted(d for d in dirs if not (Path(base)/d).is_symlink())
+            for name in sorted(names):
+                p=Path(base)/name
+                if p.is_symlink(): raise ValueError(f'Symlink not supported in external content snapshot: {p}')
+                relative=p.relative_to(external_root).as_posix()
+                if not any(fnmatch.fnmatchcase(relative,pattern) for pattern in item['include']): continue
+                identity=(external_root.as_posix()+'/'+relative).casefold()
+                h.update(b'external\0'); h.update(identity.encode()); h.update(b'\0'); h.update(p.read_bytes()); h.update(b'\0')
     return h.hexdigest()
 
 def plan_hash(root):

@@ -1,0 +1,181 @@
+{
+  "review": {
+    "ticket_id": "T-010",
+    "verdict": "PASS",
+    "review_round": 1,
+    "source_hash": "111d848c06adcdb2d6e110aae340142719f0ea268a54ee870f5a726b7ab733ee",
+    "verification_id": "f8d1779a5c5f4df7ae9a6b3a2a5f84ce",
+    "criteria": [
+      {
+        "id": "AT-001",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt f8d1779a5c5f4df7ae9a6b3a2a5f84ce reports AT-001 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/c1fca7f0bc7b426fae5bd49cdfab3afc.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-002",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-002 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/c1fca7f0bc7b426fae5bd49cdfab3afc.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-003",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-003 PASSED returncode 0 (after the transient start-retry fix).",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/c1fca7f0bc7b426fae5bd49cdfab3afc.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-004",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-004 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/c1fca7f0bc7b426fae5bd49cdfab3afc.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-005",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-005 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/c1fca7f0bc7b426fae5bd49cdfab3afc.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-006",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-006 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/c1fca7f0bc7b426fae5bd49cdfab3afc.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-007",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-007 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/c1fca7f0bc7b426fae5bd49cdfab3afc.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-008",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-008 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/c1fca7f0bc7b426fae5bd49cdfab3afc.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-009",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt reports AT-009 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/c1fca7f0bc7b426fae5bd49cdfab3afc.json",
+        "limitations": "Automated prerequisite step; not a whole-ticket verdict."
+      },
+      {
+        "id": "AT-010",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt f8d1779a5c5f4df7ae9a6b3a2a5f84ce reports AT-010 PASSED returncode 0; the isolated runtime added services via the management page and drove the lifecycle through the private HTTPS entry (https://alvin.tail63d20f.ts.net:8443/mcp), stop/start and calls all succeeded.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/c1fca7f0bc7b426fae5bd49cdfab3afc.json",
+        "limitations": "The receipt states manual criteria are still required; the manual criteria below supply the missing review evidence."
+      },
+      {
+        "id": "AC-MOBILE-ENTRY",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "From the iPhone (iphone-15-plus, tailnet online, Wi-Fi off / mobile network) via Open Minis at the single HTTPS entry https://alvin.tail63d20f.ts.net:8443/mcp, both services were called and matched: everything-stdio_1mcp_get-sum {a:2,b:3} -> 'The sum of 2 and 3 is 5.'; everything-http_1mcp_get-sum -> 'The sum of 2 and 2 is 4.' (and {a:2,b:3} -> 5). MagicDNS resolved alvin.tail63d20f.ts.net -> 100.119.224.46.",
+        "source": "iPhone Open Minis manual run (operator-reported output); host verify: tailscale status (iphone-15-plus online), tailscale serve status (443/8443 tailnet-only), curl host->8443 = 200",
+        "limitations": "Operated on a real iPhone over the tailnet; the exact radio (Wi-Fi vs cellular) is confirmed by the operator, not machine-observable from the host."
+      },
+      {
+        "id": "AC-AUTH-SCOPE",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "The authorized tailnet device is reachable (iPhone calls succeeded). The private entry is served tailnet-only (tailscale serve, no funnel), so non-tailnet sources are rejected; the admin page (3230) and the Gateway (3213) listen only on 127.0.0.1, so the management page stays local-only. Direct host->:8443 returns 200 while :3213 is not tailnet-reachable by design.",
+        "source": "Get-NetTCPConnection: 127.0.0.1:3230 and 127.0.0.1:3213; tailscale serve status (tailnet only); iPhone success",
+        "limitations": "Non-tailnet rejection rests on the tailnet-only Serve mode and loopback binding; no external/non-tailnet device was used to demonstrate a denial."
+      },
+      {
+        "id": "AC-OFFLINE-RECOVERY",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "With the Gateway stopped via the management page (/api/gateway/stop), the iPhone call through the same entry failed distinguishably: ping and call both returned {\"error\":\"HTTP 502: \",\"code\":\"CONNECTION_ERROR\",\"server\":\"mcp-hub\"}. After restarting the Gateway (/api/gateway/start), ping returned {\"ok\":true,\"elapsed_ms\":538} and the tool call returned the expected result.",
+        "source": "Host stop/start via Hub API; iPhone Open Minis operator-reported outputs; host curl host->8443 = 502 then 200",
+        "limitations": "Demonstrated service-stop failure and recovery; the 'host offline' (network-down) variant is covered by the same tailnet path being unreachable when the host is disconnected and was not separately performed."
+      },
+      {
+        "id": "AC-NO-REWRITE",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "No change was made to Open Minis, and no request replay or remote-wake mechanism was added; the iPhone simply calls the private HTTPS entry and receives MCP results, with offline reported as an explicit CONNECTION_ERROR rather than a false success.",
+        "source": "No Open Minis/ iOS changes; product change limited to app/src/gateway-controller.js (externalUrl passthrough + transient start retry)",
+        "limitations": "Design constraint verified by the absence of such mechanisms, not by a separate automated assertion."
+      }
+    ],
+    "findings": []
+  },
+  "handoff": {
+    "ticket_id": "T-010",
+    "review_round": 1,
+    "source_hash": "111d848c06adcdb2d6e110aae340142719f0ea268a54ee870f5a726b7ab733ee",
+    "verification_id": "f8d1779a5c5f4df7ae9a6b3a2a5f84ce",
+    "changes": [
+      {
+        "file": "app/src/gateway-controller.js",
+        "summary": "Pass --external-url to @1mcp when configured, so the Gateway accepts the public Host header of a private HTTPS entry (Tailscale Serve) alongside loopback; and retry --background once after the state settles when it fails transiently ('did not become ready'), removing the stop/config-reload race that made the apply/restart occasionally fail."
+      },
+      {
+        "file": "app/test/gateway-controller.test.js",
+        "summary": "Adds a test covering the transient not-ready start failure settling and retrying once, then succeeding."
+      },
+      {
+        "file": "followup-20261011-t005-formal-09/hub-t005.cjs",
+        "summary": "Test hub sets gateway.externalUrl = https://alvin.tail63d20f.ts.net:8443 so the private entry's Host header is accepted."
+      },
+      {
+        "file": "followup-20261011-t005-formal-09/fixture.json",
+        "summary": "Adds private_gateway_url = https://alvin.tail63d20f.ts.net:8443/mcp for AT-010."
+      }
+    ],
+    "verification": [
+      {
+        "step": "python -B harness/runner/runner.py verify-ticket --ticket T-010 --trust-commands --timeout 600",
+        "expected": "AT-001 through AT-010 all PASSED with returncode 0 and a source-hash-bound receipt.",
+        "actual": "all_passed=true; AT-001..AT-010 PASSED; verification_id f8d1779a5c5f4df7ae9a6b3a2a5f84ce; source_hash 111d848c06adcdb2d6e110aae340142719f0ea268a54ee870f5a726b7ab733ee.",
+        "status": "PASS"
+      },
+      {
+        "step": "C:\\Users\\m8508\\mcphub\\app: npm test",
+        "expected": "All product unit tests pass, including the new transient-retry test.",
+        "actual": "77/77 passed.",
+        "status": "PASS"
+      },
+      {
+        "step": "Host reachability of the private entry",
+        "expected": "https://alvin.tail63d20f.ts.net:8443/mcp serves the Gateway.",
+        "actual": "curl host->8443 returned 200 with a valid MCP initialize; with the Gateway stopped it returned 502.",
+        "status": "PASS"
+      },
+      {
+        "step": "iPhone (Open Minis) manual run over the tailnet",
+        "expected": "Both managed services callable via the same private entry; offline shows a distinguishable failure; recovery works.",
+        "actual": "Operator reported: everything-stdio get-sum {2,3} -> 'The sum of 2 and 3 is 5.'; everything-http get-sum -> 'The sum of 2 and 2 is 4.'; with Gateway stopped ping/call -> HTTP 502 CONNECTION_ERROR; after restart ping ok (538ms) and call returned the expected result.",
+        "status": "PASS"
+      }
+    ],
+    "dependencies": [
+      "@1mcp/agent 0.38.2 (with the T-005/T-006 toolRequestHandlers patch)",
+      "Tailscale on host (alvin.tail63d20f.ts.net, 100.119.224.46) and iPhone; tailscale serve --https=8443 -> 127.0.0.1:3213",
+      "Node.js 24.19.0 on Windows",
+      "tests/acceptance/check.py and the isolated T-010 fixture D:/AI-Lab/MCP-HUB-acceptance/followup-20261011-t005-formal-09/fixture.json",
+      "T-003 COMPLETE management page"
+    ]
+  }
+}

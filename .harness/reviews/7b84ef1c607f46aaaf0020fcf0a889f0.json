@@ -1,0 +1,181 @@
+{
+  "review": {
+    "ticket_id": "T-011",
+    "verdict": "PASS",
+    "review_round": 1,
+    "source_hash": "c26e31ce94dca39d380f6e28c176f499cb8dffe7386d956bcd708af5743f455a",
+    "verification_id": "e3278ab4c2d2418e8a2601c977400f74",
+    "criteria": [
+      {
+        "id": "AT-001",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt e3278ab4c2d2418e8a2601c977400f74 reports AT-001 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/fa5eccf8fb8e4649bdcf4aa86cbf8771.json",
+        "limitations": "Integrated re-run of the T-001 subset."
+      },
+      {
+        "id": "AT-002",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "receipt reports AT-002 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/fa5eccf8fb8e4649bdcf4aa86cbf8771.json",
+        "limitations": "Integrated re-run of the T-002 subset."
+      },
+      {
+        "id": "AT-003",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "receipt reports AT-003 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/fa5eccf8fb8e4649bdcf4aa86cbf8771.json",
+        "limitations": "Integrated re-run of the T-003 subset."
+      },
+      {
+        "id": "AT-004",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "receipt reports AT-004 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/fa5eccf8fb8e4649bdcf4aa86cbf8771.json",
+        "limitations": "Integrated re-run of the T-004 subset."
+      },
+      {
+        "id": "AT-005",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "receipt reports AT-005 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/fa5eccf8fb8e4649bdcf4aa86cbf8771.json",
+        "limitations": "Integrated re-run of the T-005 subset."
+      },
+      {
+        "id": "AT-006",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "receipt reports AT-006 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/fa5eccf8fb8e4649bdcf4aa86cbf8771.json",
+        "limitations": "Integrated re-run of the T-006 subset."
+      },
+      {
+        "id": "AT-007",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "receipt reports AT-007 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/fa5eccf8fb8e4649bdcf4aa86cbf8771.json",
+        "limitations": "Integrated re-run of the T-007 subset."
+      },
+      {
+        "id": "AT-008",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "receipt reports AT-008 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/fa5eccf8fb8e4649bdcf4aa86cbf8771.json",
+        "limitations": "Integrated re-run of the T-008 subset."
+      },
+      {
+        "id": "AT-009",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "receipt reports AT-009 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/fa5eccf8fb8e4649bdcf4aa86cbf8771.json",
+        "limitations": "Integrated re-run of the T-009 subset."
+      },
+      {
+        "id": "AT-010",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "receipt reports AT-010 PASSED returncode 0.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/fa5eccf8fb8e4649bdcf4aa86cbf8771.json",
+        "limitations": "Integrated re-run of the T-010 subset."
+      },
+      {
+        "id": "AT-011",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "verify-ticket receipt e3278ab4c2d2418e8a2601c977400f74 (file fa5eccf8fb8e4649bdcf4aa86cbf8771.json) reports AT-011 PASSED returncode 0; it re-ran check_001..check_010 on the same build and then a single continuous UI golden path (add, apply, health, close page, private-entry calls, edit, disable, delete, logs, gateway lifecycle).",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/fa5eccf8fb8e4649bdcf4aa86cbf8771.json",
+        "limitations": "The receipt states manual criteria are still required; the manual criteria below supply the missing review evidence."
+      },
+      {
+        "id": "FINAL_INTEGRATION",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "The final integrated verification (verify_final_integrated) ran all Golden Path steps AT-001..AT-011 on the same build/source hash and reported all PASSED.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/fa5eccf8fb8e4649bdcf4aa86cbf8771.json; harness final_verification artifact",
+        "limitations": "Runs the automated golden path on one build; the manual iPhone step is covered separately below."
+      },
+      {
+        "id": "AC-IPHONE-E2E",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "Real iPhone (iphone-15-plus) on the tailnet over mobile network, via Open Minis at the single private HTTPS entry https://alvin.tail63d20f.ts.net:8443/mcp, called both downstreams with real results: everything-stdio_1mcp_get-sum {a:2,b:3} -> 'The sum of 2 and 3 is 5.'; everything-http_1mcp_get-sum -> 'The sum of 2 and 2 is 4.'; stopping the Gateway gave an identifiable failure (HTTP 502 CONNECTION_ERROR) and recovery restored ping (ok, 538ms) and calls. Version: C: mcphub 73c3443 + uncommitted T-010 changes; D: harness 6c89d6b. Operator: user (alvinthisis@).",
+        "source": "Operator-reported iPhone Open Minis outputs; host: tailscale status, tailscale serve status, curl host->8443 = 200/502",
+        "limitations": "iPhone results are operator-reported; radio (Wi-Fi vs cellular) confirmed by the operator, not machine-observable from the host; the iPhone ran against the isolated test services, not a production tool set."
+      },
+      {
+        "id": "AC-VT-RERUN",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "AT-011 re-ran each ticket's automated subset (check_001..check_010) on the same build within the T-011 run, and the final integrated verification re-ran AT-001..AT-011; all PASSED.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications/fa5eccf8fb8e4649bdcf4aa86cbf8771.json (AT-011); tests/acceptance/check.py check_011",
+        "limitations": "Covers the automated subsets; the VT-01..VT-08 negative/manual variants remain documented per ticket in their reviews."
+      },
+      {
+        "id": "AC-ARTIFACT-READBACK",
+        "status": "PASS",
+        "critical": true,
+        "evidence": "Receipts and reviews for T-001..T-011 were read back and their source_hash values match the current harness source hash where the tickets are COMPLETE; no older build/config artifacts were mixed in for the final run.",
+        "source": "D:/AI-Lab/MCP HUB/.harness/verifications, .harness/reviews, .harness/state.json",
+        "limitations": "Source hash covers the harness project; the product repository is tracked separately (C: mcphub)."
+      }
+    ],
+    "findings": []
+  },
+  "handoff": {
+    "ticket_id": "T-011",
+    "review_round": 1,
+    "source_hash": "c26e31ce94dca39d380f6e28c176f499cb8dffe7386d956bcd708af5743f455a",
+    "verification_id": "e3278ab4c2d2418e8a2601c977400f74",
+    "changes": [
+      {
+        "file": "tests/acceptance/check.py",
+        "summary": "check_011 re-runs each ticket's automated subset and a single continuous UI golden path (add/apply/health/private calls/edit/disable/delete/logs/lifecycle) on the same build; no new product code."
+      },
+      {
+        "file": "followup-20261011-t005-formal-09/fixture.json",
+        "summary": "Final integration fixture with all fields (services, gateway_log/log_marker, outside_sentinel/file_allowed/file_denied, private_gateway_url) on one isolated runtime."
+      }
+    ],
+    "verification": [
+      {
+        "step": "python -B harness/runner/runner.py verify-ticket --ticket T-011 --trust-commands --timeout 1200",
+        "expected": "AT-001 through AT-011 all PASSED with returncode 0 and a source-hash-bound receipt.",
+        "actual": "all_passed=true; AT-001..AT-011 PASSED; verification_id e3278ab4c2d2418e8a2601c977400f74; source_hash c26e31ce94dca39d380f6e28c176f499cb8dffe7386d956bcd708af5743f455a.",
+        "status": "PASS"
+      },
+      {
+        "step": "C:\\Users\\m8508\\mcphub\\app: npm test",
+        "expected": "All product unit tests pass.",
+        "actual": "78/78 passed in C:\\Users\\m8508\\mcphub\\app.",
+        "status": "PASS"
+      },
+      {
+        "step": "iPhone (Open Minis) end-to-end over the tailnet through the single private HTTPS entry",
+        "expected": "Two downstreams callable with real results; offline distinguishable; recovery works.",
+        "actual": "Operator reported everything-stdio get-sum {2,3} -> 5; everything-http get-sum -> 4; Gateway stop -> HTTP 502 CONNECTION_ERROR; recovery -> ping ok (538ms) + calls OK.",
+        "status": "PASS"
+      },
+      {
+        "step": "Final integrated verification over AT-001..AT-011 on the same build",
+        "expected": "All Golden Path steps PASSED.",
+        "actual": "All PASSED (recorded in the harness final_verification and the T-011 receipt).",
+        "status": "PASS"
+      }
+    ],
+    "dependencies": [
+      "@1mcp/agent 0.38.2 (with the T-005/T-006 toolRequestHandlers patch)",
+      "Tailscale host + iPhone; tailscale serve --https=8443 -> 127.0.0.1:3213",
+      "Node.js 24.19.0 on Windows",
+      "tests/acceptance/check.py and the isolated T-011 fixture D:/AI-Lab/MCP-HUB-acceptance/followup-20261011-t005-formal-09/fixture.json",
+      "T-001..T-010 COMPLETE"
+    ]
+  }
+}

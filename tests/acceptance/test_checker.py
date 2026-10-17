@@ -70,6 +70,11 @@ class CheckerTests(unittest.TestCase):
         source = Path(check.__file__).read_text(encoding="utf-8")
         self.assertIn('has_text="套用中…"', source)
 
+    def test_integrated_replay_cleans_up_random_services(self):
+        source = Path(check.__file__).read_text(encoding="utf-8")
+        self.assertIn('def cleanup_services(self, page, services):', source)
+        self.assertGreaterEqual(source.count('self.cleanup_services(page, services)'), 5)
+
     def test_browser_allows_real_gateway_restart_bound(self):
         source = Path(check.__file__).read_text(encoding="utf-8")
         self.assertIn("page.set_default_timeout(180_000)", source)

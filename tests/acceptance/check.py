@@ -284,7 +284,11 @@ class Checks:
     def apply(self, page):
         self.click(page, "儲存並套用")
         page.get_by_role("status").filter(has_text="套用中…").wait_for()
-        page.get_by_role("status").filter(has_text="設定已套用").wait_for()
+        # Applying a preserved acceptance config can restart a Gateway with
+        # more than twenty downstream services. The real request completes,
+        # but Windows process identity checks and downstream startup can exceed
+        # Playwright's default 15-second assertion timeout.
+        page.get_by_role("status").filter(has_text="設定已套用").wait_for(timeout=180_000)
 
     def add_pair(self, page):
         services = json.loads(json.dumps(self.cfg["services"]))
@@ -355,6 +359,22 @@ class Checks:
         self.call(target, denied=True)
         self.call(next(s for s in services if s["transport"] == "stdio"))
 
+    def cleanup_services(self, page, services):
+        """Remove only the random services created by this check run.
+
+        The fixture's canonical services are never touched. Keeping the cleanup
+        here makes repeated integrated verification idempotent instead of
+        accumulating another pair on every check_003/004/007/010 replay.
+        """
+        for service in services:
+            row = self.row(page, service)
+            if row.count() == 0:
+                continue
+            row.get_by_role("button", name="刪除", exact=True).click()
+            self.apply(page)
+            page.reload()
+            require(self.row(page, service).count() == 0, "test-created service cleanup failed")
+
     def health(self, page, services):
         for service in services:
             row = self.row(page, service)
@@ -388,19 +408,26 @@ class Checks:
 
     def check_003(self):
         with self.browser() as page:
-            self.add_pair(page)
+            services = self.add_pair(page)
+            self.cleanup_services(page, services)
 
     def check_004(self):
         with self.browser() as page:
-            self.edit(page, self.add_pair(page))
+            services = self.add_pair(page)
+            self.edit(page, services)
+            self.cleanup_services(page, services)
 
     def check_005(self):
         with self.browser() as page:
-            self.remove_or_disable(page, self.add_pair(page), delete=False)
+            services = self.add_pair(page)
+            self.remove_or_disable(page, services, delete=False)
+            self.cleanup_services(page, services)
 
     def check_006(self):
         with self.browser() as page:
-            self.remove_or_disable(page, self.add_pair(page), delete=True)
+            services = self.add_pair(page)
+            self.remove_or_disable(page, services, delete=True)
+            self.cleanup_services(page, services)
 
     def check_007(self):
         with self.browser() as page:
@@ -408,6 +435,7 @@ class Checks:
             self.health(page, services)
             self.remove_or_disable(page, services, delete=False)
             self.row(page, next(s for s in services if s["transport"] == "http")).get_by_text("已停用", exact=True).wait_for()
+            self.cleanup_services(page, services)
 
     def check_008(self):
         with self.browser() as page:
@@ -425,6 +453,7 @@ class Checks:
         with self.browser() as page:
             services = self.add_pair(page)
             self.lifecycle(page, services, endpoint)
+            self.cleanup_services(page, services)
 
     def check_011(self):
         # Re-run each independent automated subset on the same running build.
@@ -444,6 +473,7 @@ class Checks:
             self.logs(page)
             remaining = [s for s in services if s["transport"] == "stdio"]
             self.lifecycle(page, remaining)
+            self.cleanup_services(page, services)
 
 
 def main(argv=None):

@@ -221,7 +221,21 @@
       "expected_output": "AUTOMATED_CHECK_PASS T-011"
     }
   ],
-  "source_hash_exclude": [],
+  "source_hash_exclude": [
+    ".codebase-memory"
+  ],
+  "source_hash_external_roots": [
+    {
+      "path": "C:/Users/m8508/mcphub/app",
+      "include": [
+        "src/**",
+        "public/**",
+        "test/**",
+        "package.json",
+        "package-lock.json"
+      ]
+    }
+  ],
   "env_passthrough": [
     "MCP_HUB_ACCEPTANCE_CONFIG",
     "MCP_HUB_ACCEPTANCE_ALLOW_MUTATION"

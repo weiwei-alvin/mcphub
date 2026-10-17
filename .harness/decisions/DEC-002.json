@@ -1,0 +1,16 @@
+{
+  "decision_ref": "DEC-002",
+  "pause_id": "aa797fa02f1e435c8d93f3d45ccb358c",
+  "reason": "PLAN_CHANGE_REQUIRES_DECISION",
+  "ticket_id": "T-011",
+  "pipeline_stage": "IMPLEMENTATION",
+  "options": [
+    "CONTINUE"
+  ],
+  "resolved": true,
+  "chosen_option": "CONTINUE",
+  "rationale": "Approved bounded harness repair: exclude generated .codebase-memory index artifacts from source hash so background indexing cannot invalidate T-011 evidence.",
+  "source": "Codex handoff continuation 2026-10-15",
+  "context": null,
+  "plan_hash": "71177926cfee5cd72a96890804ef76178a855df06f688f3b51b7a941af4e34bd"
+}

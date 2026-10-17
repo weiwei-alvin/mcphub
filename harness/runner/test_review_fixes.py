@@ -212,6 +212,16 @@ class ReviewFixes(unittest.TestCase):
         (self.root/'.harness/tickets/T-001.md').write_text('---\nid: T-001\ndepends_on: []\n---\n# edited\n')
         self.assertNotEqual(a,source_hash(self.root))
 
+    def test_external_source_files_are_bound_to_source_hash(self):
+        from storage import source_hash
+        external = Path(tempfile.mkdtemp(prefix='harness-product-source-'))/'server.js'
+        self.addCleanup(lambda: external.parent.exists() and __import__('shutil').rmtree(external.parent))
+        external.write_text('module.exports = 1;\n',encoding='utf-8')
+        self.plan(source_hash_external_roots=[dict(path=str(external.parent),include=['server.js'])])
+        before=source_hash(self.root)
+        external.write_text('module.exports = 2;\n',encoding='utf-8')
+        self.assertNotEqual(before,source_hash(self.root))
+
     def test_dangerous_or_unknown_settings_rejected(self):
         from storage import project_settings, source_hash
         for bad in (['.harness/tickets'],['*'],['**/*'],['../x'],['/abs'],['C:/x'],[''],'x'):

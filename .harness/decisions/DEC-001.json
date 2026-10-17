@@ -7,9 +7,9 @@
   "options": [
     "FIX_REQUIRED"
   ],
-  "resolved": false,
-  "chosen_option": "",
-  "rationale": "",
-  "source": "",
+  "resolved": true,
+  "chosen_option": "FIX_REQUIRED",
+  "rationale": "User provided iPhone; host joined tailnet; proceed with T-010 remote acceptance evidence",
+  "source": "tailscale status: Running, DNSName alvin.tail63d20f.ts.net, IP 100.119.224.46; iPhone iphone-15-plus present in tailnet",
   "context": null
 }
