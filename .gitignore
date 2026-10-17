@@ -1,6 +1,10 @@
 node_modules/
 __pycache__/
 .serena/
-.claude/
+.claude/*
+!.claude/settings.json
 .harness.bak-*/
 .harness/writer.lock
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/
