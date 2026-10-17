@@ -3,7 +3,7 @@ document_title: MCP Hub V1 Ticket Index
 chinese_title: MCP Hub 第一版工單索引與驗證狀態
 aka: []
 established_date: 2026-10-02
-updated_date: 2026-10-02
+updated_date: 2026-10-04
 version: 1.0.0
 ---
 
@@ -11,14 +11,14 @@ version: 1.0.0
 
 本表的狀態欄由每次工單狀態轉移後人工同步，權威來源是 `.harness/state.json`（用 `python -B harness/runner/runner.py read` 讀取）。本表若與該檔不一致，以 state.json 為準。
 
-狀態欄最後同步：2026-10-03，T-002 review-verdict PASS 之後。
+狀態欄最後同步：2026-10-04；T-003 依 runtime state 已完成，T-004 仍在實作中。
 
 | 工單 | 交付結果 | 直接前置 | 狀態 |
 | --- | --- | --- | --- |
 | [T-001](.harness/tickets/T-001.md) | iPhone 經私人單一入口呼叫兩種 MCP | 無 | COMPLETE |
 | [T-002](.harness/tickets/T-002.md) | 從本機單一入口安全控制 Gateway | T-001 | COMPLETE |
-| [T-003](.harness/tickets/T-003.md) | 從管理頁新增並安全套用 MCP | T-002 | IN_PROGRESS |
-| [T-004](.harness/tickets/T-004.md) | 編輯既有 MCP 並持久生效 | T-003 | TODO |
+| [T-003](.harness/tickets/T-003.md) | 從管理頁新增並安全套用 MCP | T-002 | COMPLETE |
+| [T-004](.harness/tickets/T-004.md) | 編輯既有 MCP 並持久生效 | T-003 | IN_PROGRESS |
 | [T-005](.harness/tickets/T-005.md) | 停用 MCP 並阻止後續呼叫 | T-003 | TODO |
 | [T-006](.harness/tickets/T-006.md) | 刪除 MCP 設定並阻止後續呼叫 | T-003 | TODO |
 | [T-007](.harness/tickets/T-007.md) | 顯示下游檢查結果並主動測試連線 | T-005 | TODO |
@@ -31,7 +31,7 @@ version: 1.0.0
 
 - 建立 11 張 .harness/tickets/T-NNN.md；每張有 id、depends_on、需求來源、單一結果、完整驗收、自動子集及必要補充證據。
 - 建立 [.harness/golden_path.json](.harness/golden_path.json)，共 11 個 AT 步驟；每個只引用自身工單，依赖由工單 DAG 約束。T-011 的前置閉包含其他全部工單。
-- 建立 [驗證程式](tests/acceptance/check.py)、[驗證契約](tests/acceptance/README.md) 與 [驗證程式自測](tests/acceptance/test_checker.py)。没有產品程式、安裝或服務設定變更。
+- 建立 [驗證程式](tests/acceptance/check.py)、[驗證契約](tests/acceptance/README.md) 與 [驗證程式自測](tests/acceptance/test_checker.py)，並補上 T-009 檔案範圍契約測試。產品實作與單元／路由測試結果見 [雲端驗證紀錄](docs/superpowers/verification/2026-10-04-v1-cloud-verification.md)。
 - 結構檢查已通過：11 個工單、有效且無循環的依賴、全部 15 個 US 涵蓋、每張有存在的可執行驗證檔案。
 - 驗證程式自測 9 項通過；其中一項逐一執行 11 個工單命令，證明缺少 fixture 時全部 exit 2／UNVERIFIED，不會回報自動通過。JSON／SSE 自測使用記憶體 double，不是 Gateway 相容性證據。
 - 實際執行：`python -B -m unittest discover -s tests/acceptance -p test_checker.py -v`，exit 0；另用 Python 做 AST／JSON／DAG／追溯與命令檔案檢查。
@@ -41,8 +41,10 @@ version: 1.0.0
 
 - **T-001**：COMPLETE。驗收 receipt `verifications/0e3d7856b7db4620be736e7fd8c5c7cc.json`，review r1 PASS。真實 iPhone 證據與未驗證項（Open Minis 版本無截圖、無非 tailnet 來源探測、呼叫走 Minis 內的 `minis-mcp-cli`）記於 `.harness/reviews/cf6fd3e4eb514f56907448a558437d2c.json`。
 - **T-002**：COMPLETE。驗收 receipt `verifications/cdeb0a47e34543b68496626f36d6076c.json`，review r1 PASS（`reviews/abee61ec688a40f8874a7494ae15eb1e.json`）。人工實測完整紀錄見 `.harness/review-notes/T-002.md`。
-- **T-003**：IN_PROGRESS，尚未開始實作。
-- T-004 ~ T-011：TODO。
+- **T-003**：COMPLETE，runtime state 有既有 verification receipt 與 review PASS。
+- **T-004**：IN_PROGRESS；服務編輯／停用／刪除與套用相關程式已加入目前工作版本，正式 acceptance receipt 尚未更新。
+- **T-005 ~ T-009**：TODO；對應程式、健康／日誌功能與 T-009 fixture 契約已加入，但尚未有隔離 Gateway 的正式產品驗收證據。
+- **T-010 ~ T-011**：TODO；需要私人網路、真實 iPhone 與完整整合證據。
 
 ### 從 T-002 帶出的未結項目
 
@@ -55,7 +57,7 @@ version: 1.0.0
 
 ### 目前建置與後續工單的落差
 
-`app/public/` 目前只有 Gateway 控制（啟動／停止／重啟 + 狀態文字）。`tests/acceptance/check.py` 從 T-003 起會操作的 `新增 MCP Server`、`儲存並套用`、服務列表、編輯／停用／刪除、連線檢查、日誌面板**尚不存在**；AT-003 之後的步驟會失敗。
+`app/public/` 已包含 Gateway 控制、服務管理、停用／刪除、連線檢查與日誌面板；目前缺的是正式隔離 fixture 下的產品 acceptance 執行。T-009 另要求真實檔案 MCP 驗證允許目錄、路徑穿越與 symlink 逃逸，T-010／T-011 仍不可由雲端單元測試代替實機證據。
 
 ## Audit 結果
 
@@ -78,12 +80,11 @@ version: 1.0.0
 
 ## 最小下一步
 
-1. **T-003**：從管理頁新增 MCP 並安全套用。`app/public/` 需要新增服務表單（服務名稱、傳輸類型、啟動命令／命令參數、服務 URL）與「儲存並套用」控制，後端需新增寫入 gateway `mcp.json` 的路由，並依 SPEC 實作「驗證後才套用、套用失敗回復上一份可用設定」。AT-003（`check.py --ticket T-003`）會以 Playwright 實際新增 stdio + http 兩筆並經 Gateway 呼叫驗證。
-2. **AC-5 的 iPhone 補證**必須在 T-010 之前完成，不阻擋 T-003。
-3. F-01 與下游 readiness 問題記入 T-007，不要在 T-003 順手做。
-4. 安裝、登入與網路變更仍需先列明範圍及回復方式；不重問已確認的產品需求。
+1. 建立隔離的 stdio／Streamable HTTP 下游 fixture，安裝 Playwright/Chromium 後依序執行 AT-004 至 AT-009；缺少 fixture 時維持 UNVERIFIED。
+2. 執行 T-009 的實際檔案 MCP，保留允許、範圍外、穿越與 symlink 逃逸證據。
+3. **AC-5 的 iPhone 補證**必須在 T-010 之前完成：由操作者從 iPhone 開啟管理頁 URL，記錄連線被拒。
+4. T-010／T-011 需由真實 iPhone、行動網路、Tailscale 與 Open Minis 完成，不能以雲端 terminal 或本機腳本冒充。
 
 ## 本檔與 runtime state 的關係
 
 本檔的狀態欄是人工同步的摘要，權威來源為 `.harness/state.json`。詳見狀態欄上方的說明。
-

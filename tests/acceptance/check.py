@@ -84,6 +84,34 @@ def private_url(value, *, loopback_only=False, remote_only=False):
     return value
 
 
+def validate_file_fixture(cfg):
+    """Fail closed unless the file-MCP fixture proves a real boundary."""
+    if cfg.get("isolated") is not True:
+        raise SetupError("file fixture must declare isolated test environment")
+    try:
+        root = Path(cfg["sandbox_root"]).resolve(strict=True)
+        marker = root / ".mcp-hub-acceptance"
+        if not marker.is_file() or marker.read_text(encoding="utf-8").strip() != "isolated-test-environment":
+            raise SetupError("isolated test directory marker missing")
+        allowed_root = Path(cfg["file_allowed_root"]).resolve(strict=True)
+    except (KeyError, FileNotFoundError, OSError) as error:
+        raise SetupError("file boundary fixture paths are incomplete") from error
+    if not allowed_root.is_dir() or not allowed_root.is_relative_to(root):
+        raise SetupError("file allowed root must be a real directory inside sandbox_root")
+
+    for key in ("file_allowed", "file_denied", "file_traversal", "file_symlink"):
+        case = cfg.get(key)
+        if not isinstance(case, dict) or not isinstance(case.get("call"), dict):
+            raise SetupError(f"file fixture case missing: {key}")
+        if not isinstance(case.get("name"), str) or not case["name"]:
+            raise SetupError(f"file fixture case name missing: {key}")
+        if key == "file_allowed":
+            if not isinstance(case.get("expected"), list) or not case["expected"]:
+                raise SetupError("allowed file case requires non-empty expected result")
+        elif not isinstance(case.get("denied_contains"), str) or not case["denied_contains"]:
+            raise SetupError(f"denied file case requires explicit denial: {key}")
+
+
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         raise SetupError("redirect refused: configure the final test endpoint explicitly")
@@ -442,10 +470,13 @@ class Checks:
             self.logs(page)
 
     def check_009(self):
+        validate_file_fixture(self.cfg)
         sentinel = self.probe_file("outside_sentinel")
         before = hashlib.sha256(sentinel.read_bytes()).hexdigest()
         self.call(self.cfg["file_allowed"])
         self.call(self.cfg["file_denied"], denied=True)
+        self.call(self.cfg["file_traversal"], denied=True)
+        self.call(self.cfg["file_symlink"], denied=True)
         require(hashlib.sha256(sentinel.read_bytes()).hexdigest() == before, "outside sentinel changed")
 
     def check_010(self):

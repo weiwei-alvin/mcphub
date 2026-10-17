@@ -141,6 +141,53 @@ describe('ConfigStore draft handling', () => {
     const store = makeStore(fs);
     assert.deepEqual(store.list().map((s) => s.name), ['pre']);
   });
+
+  it('disables a service in the draft without changing its connection data', () => {
+    const fs = fakeFs({ [effectivePath]: JSON.stringify({ mcpServers: {} }) });
+    const store = makeStore(fs);
+    store.addService(STDIO);
+
+    const disabled = store.disableService('demo-stdio');
+
+    assert.equal(disabled.disabled, true);
+    assert.equal(disabled.command, 'node');
+    assert.deepEqual(store.list(), [{
+      name: 'demo-stdio', type: 'stdio', transport: 'stdio', command: 'node', args: ['stdio'], disabled: true,
+    }]);
+    assert.equal(JSON.parse(fs.files[effectivePath]).mcpServers['demo-stdio'], undefined);
+  });
+
+  it('deletes a service from the draft but does not delete effective configuration', () => {
+    const fs = fakeFs({ [effectivePath]: JSON.stringify({
+      mcpServers: { 'demo-stdio': { type: 'stdio', command: 'node', args: [] } },
+    }) });
+    const store = makeStore(fs);
+
+    store.deleteService('demo-stdio');
+
+    assert.deepEqual(store.list(), []);
+    assert.ok(JSON.parse(fs.files[effectivePath]).mcpServers['demo-stdio']);
+  });
+
+  it('rejects disabling or deleting an unknown service', () => {
+    const fs = fakeFs({ [effectivePath]: JSON.stringify({ mcpServers: {} }) });
+    const store = makeStore(fs);
+
+    assert.throws(() => store.disableService('missing'), ValidationError);
+    assert.throws(() => store.deleteService('missing'), ValidationError);
+  });
+
+  it('keeps a disabled service disabled when its connection data is edited', () => {
+    const fs = fakeFs({ [effectivePath]: JSON.stringify({ mcpServers: {} }) });
+    const store = makeStore(fs);
+    store.addService(STDIO);
+    store.disableService('demo-stdio');
+
+    const updated = store.updateService('demo-stdio', { ...STDIO, command: 'node-new' });
+
+    assert.equal(updated.disabled, true);
+    assert.equal(updated.command, 'node-new');
+  });
 });
 
 describe('ConfigStore.apply', () => {

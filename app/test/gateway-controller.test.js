@@ -85,6 +85,21 @@ test('start(): happy path calls --background then confirms via --status', async 
   assert.deepEqual(run.calls[1], ['--background', '--host', '127.0.0.1', '--port', '3050']);
 });
 
+test('start(): passes the configured log file to the Gateway', async () => {
+  const run = queueRunner([
+    STATUS_STOPPED,
+    { code: 0, stdout: 'Background runtime started.\nPID: 448\n', stderr: '', timedOut: false },
+    STATUS_RUNNING,
+  ]);
+  const gw = controller(run, { logFile: '/fake/config/gateway.log' });
+
+  await gw.start();
+
+  assert.deepEqual(run.calls[1], [
+    '--background', '--host', '127.0.0.1', '--port', '3050', '--log-file', '/fake/config/gateway.log',
+  ]);
+});
+
 test('start(): CLI hang (port conflict) times out, force-stops, and reports a clear error', async () => {
   const run = queueRunner([
     STATUS_STOPPED,

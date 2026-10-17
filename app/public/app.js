@@ -6,6 +6,7 @@
   const applyDetailEl = document.getElementById('apply-detail');
   const draftStatusEl = document.getElementById('draft-status');
   const rowsEl = document.getElementById('service-rows');
+  const logPanel = document.getElementById('gateway-log');
   const form = document.getElementById('service-form');
 
   const gatewayButtons = {
@@ -22,6 +23,12 @@
   };
 
   const TRANSPORT_TEXT = { stdio: 'stdio', streamableHttp: 'Streamable HTTP' };
+  const HEALTH_TEXT = {
+    reachable: '可連線',
+    failed: '連線失敗',
+    disabled: '已停用',
+    unchecked: '未檢查',
+  };
   const FIELD_ERRORS = ['name', 'transport', 'command', 'args', 'url', 'form'];
   let editingName = null;
 
@@ -111,13 +118,67 @@
       name.textContent = service.name;
       const transport = document.createElement('td');
       transport.textContent = TRANSPORT_TEXT[service.transport] || service.transport;
+      const state = document.createElement('td');
+      state.textContent = service.disabled ? '已停用' : '已啟用';
+      const healthCell = document.createElement('td');
+      const health = service.health || { state: 'unchecked' };
+      const healthText = document.createElement('span');
+      healthText.textContent = HEALTH_TEXT[health.state] || '未檢查';
+      healthCell.append(healthText);
+      if (health.checkedAt) {
+        const checkedAt = document.createElement('time');
+        checkedAt.dateTime = health.checkedAt;
+        checkedAt.textContent = `（${new Date(health.checkedAt).toLocaleString()}）`;
+        healthCell.append(checkedAt);
+      }
       const actions = document.createElement('td');
       const edit = document.createElement('button');
       edit.type = 'button';
       edit.textContent = '編輯';
       edit.addEventListener('click', () => beginEdit(service));
-      actions.append(edit);
-      row.append(name, transport, actions);
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.textContent = service.disabled ? '啟用' : '停用';
+      toggle.addEventListener('click', async () => {
+        try {
+          await mutateService(service.name, 'PATCH', { disabled: !service.disabled });
+        } catch {
+          applyStatusEl.textContent = '無法連線到 MCP Hub 後端';
+          applyStatusEl.dataset.state = 'error';
+        }
+      });
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.textContent = '刪除';
+      remove.addEventListener('click', async () => {
+        if (!window.confirm(`要從 MCP Hub 設定中刪除「${service.name}」嗎？下游程式與資料不會被刪除。`)) return;
+        try {
+          if (await mutateService(service.name, 'DELETE') && editingName === service.name) clearForm();
+        } catch {
+          applyStatusEl.textContent = '無法連線到 MCP Hub 後端';
+          applyStatusEl.dataset.state = 'error';
+        }
+      });
+      const check = document.createElement('button');
+      check.type = 'button';
+      check.textContent = '測試連線';
+      check.addEventListener('click', async () => {
+        try {
+          const response = await fetch('/api/services/' + encodeURIComponent(service.name) + '/check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({}),
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.message || '連線檢查失敗');
+          await refreshServices();
+        } catch (error) {
+          applyStatusEl.textContent = error.message || '無法連線到 MCP Hub 後端';
+          applyStatusEl.dataset.state = 'error';
+        }
+      });
+      actions.append(edit, toggle, remove, check);
+      row.append(name, transport, state, healthCell, actions);
       rowsEl.append(row);
     }
   }
@@ -162,6 +223,36 @@
     clearForm();
     await refreshServices();
     return true;
+  }
+
+  async function mutateService(name, method, body) {
+    const options = { method, headers: { 'Content-Type': 'application/json' } };
+    if (body !== undefined) options.body = JSON.stringify(body);
+    const response = await fetch('/api/services/' + encodeURIComponent(name), options);
+    const data = await response.json();
+    if (!response.ok) {
+      applyStatusEl.textContent = data.message || '服務變更失敗';
+      applyStatusEl.dataset.state = 'error';
+      return false;
+    }
+    renderServices(data.services || []);
+    await refreshServices();
+    return true;
+  }
+
+  async function loadLogs() {
+    try {
+      const response = await fetch('/api/gateway/logs');
+      const data = await response.json();
+      logPanel.setAttribute('role', 'log');
+      logPanel.textContent = data.state === 'available'
+        ? data.text
+        : (data.message || 'Gateway 日誌目前無法讀取');
+      logPanel.hidden = false;
+    } catch {
+      logPanel.textContent = '無法連線到 MCP Hub 後端';
+      logPanel.hidden = false;
+    }
   }
 
   form.addEventListener('submit', async (event) => {
@@ -236,6 +327,8 @@
       applyStatusEl.dataset.state = 'error';
     }
   });
+
+  document.getElementById('show-logs').addEventListener('click', loadLogs);
 
   call('status');
   refreshServices().catch(() => {});

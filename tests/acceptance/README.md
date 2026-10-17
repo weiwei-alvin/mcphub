@@ -45,7 +45,8 @@ check.py 是實際向 Gateway 發出請求並操作管理 UI 的驗證程式，�
 | replacement_http | T-004 起需提供不同安全 HTTP endpoint 及不同 expected，讓編輯生效可被觀察。 |
 | gateway_log、log_marker | T-008 起需提供 sandbox_root 內的實際日誌及事先產生的已知診斷事件字串。 |
 | outside_sentinel | T-009 使用的安全哨兵檔，位於 sandbox_root 內、但在被測 MCP 允許目錄之外；不得使用真實個人資料。 |
-| file_allowed、file_denied | 各有 name、call、expected 或 denied_contains，描述真正的允許及拒絕工具請求。 |
+| file_allowed_root | T-009 使用的實際允許資料夾；必須是 sandbox_root 內的真實目錄，不能是逃出範圍的連結。 |
+| file_allowed、file_denied、file_traversal、file_symlink | 各有 name、call，以及 allowed case 的 expected 或 denied cases 的 denied_contains，描述真正的允許、範圍外、路徑穿越與連結逃逸請求。 |
 | private_gateway_url | T-010 起需要，必须是非 loopback 的私人 Gateway 位址。主機使用此位址仍不等於 iPhone 實測。 |
 
 每筆 services 必須有：name、transport、call、expected、denied_contains。stdio 另有 command 與 arguments 清單，HTTP 另有 url。call 是實際 Gateway 的 tools/call params，包含 name 與 arguments；以 `$SERVICE` 作為由 UI 新增的服務名稱替換點。Gateway 若使用路由工具，在此填實際路由呼叫，不假設工具全部平鋪。
@@ -69,7 +70,7 @@ expected 是非空 assertion 清單，每筆包含 path 與 equals。例如 path
 
 - 自動程式涵蓋每張工單的真實行為子集；完整 acceptance criteria 仍以各工單為準。故障恢復、過期 PID、來源限制及部分 UI 邊界尚需實作階段補上可重現測試與證據，不能在審查時省略。
 - initialize／tools/list／tools/call probe 支援 JSON 與 SSE 回應、session header 及協定版本檢查，但不是完整 MCP SDK；不支援自動登入、舊 SSE transport 或 server-to-client 互動工具。只選符合無憑證測試範圍的工具。
-- 停用／刪除測試先證明兩服務可用，再要求一個被拒、另一個仍可用。T-009 的單一哨兵檔雜湊只能證明該樣本未變，完整邊界驗收還需穿越、連結與讀寫案例。
+- 停用／刪除測試先證明兩服務可用，再要求一個被拒、另一個仍可用。T-009 現在要求允許目錄、範圍外、路徑穿越與連結逃逸四組實際工具請求；哨兵檔雜湊只是其中一項證據，不能單獨代表完整邊界驗收。
 - T-011 先重跑各自動子集，再做連續 UI 主流程；其私人 endpoint 請求仍由主機發出。SPEC 的 iPhone 步驟必須再由手機實際完成，不能用 T-011 exit 0 代替。
 
 ## 本輪可執行的驗證程式自測
